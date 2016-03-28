@@ -10,15 +10,18 @@ windowName = b"window"
 windowWidth = 1000
 windowHeight = 800
 
-toggleAxes = 0
+toggleAxes = 1
 toggleValues = 1
 toggleMode = 0
-th = 0
-ph = 0
+th = -20
+ph = 20
 fov = 55
 asp = 1
 
 objId = 1
+
+treeDepth = 3
+branches = 3
 
 def Cos(th):
     return cos(pi/180*th)
@@ -118,8 +121,6 @@ def drawCylinder(height, radius):
 def drawTree(depth, height, radius):
     drawCylinder(height, radius)
 
-    branches = 3
-
     for branch in range(branches):
         glPushMatrix()
         glTranslatef(0, height, 0)
@@ -141,7 +142,7 @@ def display():
     drawAxes()
     drawValues()
 
-    drawTree(4, 50, 5)
+    drawTree(treeDepth, 50, 5)
     
     glFlush()
     glutSwapBuffers()
@@ -154,7 +155,7 @@ def reshape(width, height):
     project()
 
 def windowKey(key, x, y):
-    global objId, toggleAxes, toggleValues, toggleMode, fov, dim
+    global objId, toggleAxes, toggleValues, toggleMode, fov, dim, treeDepth, branches
     if key == b'\x1b':
         exit(0)
     elif key == b' ':
@@ -176,6 +177,14 @@ def windowKey(key, x, y):
         dim += 5
     elif key == b'l':
         dim -= 5
+    elif key == b'3':
+        treeDepth = max(0, treeDepth - 1)
+    elif key == b'4':
+        treeDepth += 1
+    elif key == b'1':
+        branches = max(2, branches - 1)
+    elif key == b'2':
+        branches += 1
 
     project()
     glutPostRedisplay()
@@ -210,7 +219,7 @@ def main():
     glutKeyboardFunc(windowKey)
     glutSpecialFunc(windowSpecial)
     glutCreateMenu(windowMenu)
-    glutIdleFunc(display)
+    #glutIdleFunc(display)
     #glutAddMenuEntry("Toggle Axes [a]", 'a')
     #glutAddMenuEntry("Toggle Values [v]", 'v')
     #glutAddMenuEntry("Toggle Mode [m]", 'm')
