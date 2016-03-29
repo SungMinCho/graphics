@@ -155,6 +155,7 @@ class IronMan:
     def __init__(self):
         self.rightArmAngle1 = 10
         self.rightArmAngle2 = 30
+        self.rightArmLaserLength = 1
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
 
@@ -196,8 +197,12 @@ class IronMan:
         glTranslatef(0, 20, 0)
         glRotatef(self.rightArmAngle2, 1, 0, 0)
         drawStand(3, 3, 3, 3, 15, 1, 0, 0)
-        glPopMatrix()
 
+        glPushMatrix()
+        glTranslatef(0, 15, 0)
+        drawCylinder(self.rightArmLaserLength, 2, 0, 1, 1, 0, 1, 1)
+        glPopMatrix()
+        glPopMatrix()
         glPopMatrix()
 
     def drawLeftArm(self):
