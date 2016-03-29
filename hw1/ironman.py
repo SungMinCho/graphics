@@ -12,7 +12,7 @@ windowHeight = 800
 
 toggleAxes = 1
 toggleValues = 1
-toggleMode = 0
+toggleMode = 1
 th = -20
 ph = 20
 fov = 55
@@ -163,31 +163,74 @@ class IronMan:
         self.init()
 
     def tick(self):
-        if self.rightArmAngle1 == 90:
-            if self.rightArmAngle2 == 0:
-                if self.rightArmLaserLength == 50:
+        if self.rightArmAngle1 >= 90:
+            if self.rightArmAngle2 <= 0:
+                if self.rightArmLaserLength >= 500:
                     self.init()
                 else:
-                    self.rightArmLaserLength += 1
+                    self.rightArmLaserLength += 25
             else:
                 self.rightArmAngle2 -= 3
         else:
-            self.rightArmAngle1 += 20
+            self.rightArmAngle1 += 3
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
+        
+        glColor3f(1, 1, 0)
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(-7, 17, 5.1)
+        glVertex3d(7, 17, 5.1)
+        glVertex3d(-7, 0, 5.1)
+        glVertex3d(7, 0, 5.1)
+        glEnd()
 
-        glPushMatrix()
-        glTranslatef(0, 0, 3)
-        drawStand(5, 4, 5, 4, 15, 1, 1, 0)
-        glPopMatrix()
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(7, 17.1, 5.1)
+        glVertex3d(3, 17.1, 5.1)
+        glVertex3d(7, 17.1, 0)
+        glVertex3d(3, 17.1, 0)
+        glEnd()
 
-        glPushMatrix()
-        glTranslatef(-3, 6, 10)
-        #drawCube(2, 1, 1, 1)
-        glTranslatef(6, 0, 0)
-        #drawCube(2, 1, 1, 1)
-        glPopMatrix()
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(-7, 17.1, 5.1)
+        glVertex3d(-3, 17.1, 5.1)
+        glVertex3d(-7, 17.1, 0)
+        glVertex3d(-3, 17.1, 0)
+        glEnd()
+
+        glColor3f(0, 0, 0)
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(-5.2, 10.2, 5.15) 
+        glVertex3d(-0.8, 10.2, 5.15) 
+        glVertex3d(-5.2, 6, 5.15) 
+        glVertex3d(-0.8, 6, 5.15) 
+        glEnd()
+
+        glColor3f(0, 0, 0)
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(5.2, 10.2, 5.15) 
+        glVertex3d(0.8, 10.2, 5.15) 
+        glVertex3d(5.2, 6, 5.15) 
+        glVertex3d(0.8, 6, 5.15) 
+        glEnd()
+
+
+        glColor3f(1, 1, 1)
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(-5, 10, 5.2) 
+        glVertex3d(-1, 10, 5.2) 
+        glVertex3d(-5, 6, 5.2) 
+        glVertex3d(-1, 6, 5.2) 
+        glEnd()
+
+        glColor3f(1, 1, 1)
+        glBegin(GL_QUAD_STRIP)
+        glVertex3d(5, 10, 5.2) 
+        glVertex3d(1, 10, 5.2) 
+        glVertex3d(5, 6, 5.2) 
+        glVertex3d(1, 6, 5.2) 
+        glEnd()
 
     def drawBody(self):
         glPushMatrix()
@@ -195,7 +238,7 @@ class IronMan:
         drawStand(9, 5, 9, 5, 30, 1, 0, 0)
 
         glPushMatrix()
-        glTranslatef(0, 20, 0)
+        glTranslatef(0, 25, 0)
         glRotatef(90, 1, 0, 0)
         drawCylinder(7, 3, 1, 1, 1, 1, 1, 1)
         glPopMatrix()
@@ -255,7 +298,7 @@ def display():
     drawValues()
 
     ironman.draw()
-    
+
     glFlush()
     glutSwapBuffers()
 
