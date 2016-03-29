@@ -153,7 +153,10 @@ def drawStand(a1, b1, a2, b2, h, r, g, b):
 
 class IronMan:
     def __init__(self):
-        pass
+        self.rightArmAngle1 = 10
+        self.rightArmAngle2 = 30
+        self.leftArmAngle1 = 10
+        self.leftArmAngle2 = 30
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
@@ -171,6 +174,8 @@ class IronMan:
         glPopMatrix()
 
     def drawBody(self):
+        glPushMatrix()
+        glTranslatef(0, -30, 0)
         drawStand(9, 5, 9, 5, 30, 1, 0, 0)
 
         glPushMatrix()
@@ -178,13 +183,44 @@ class IronMan:
         glRotatef(90, 1, 0, 0)
         drawCylinder(7, 3, 1, 1, 1, 1, 1, 1)
         glPopMatrix()
+        glPopMatrix()
+
+    def drawRightArm(self):
+        glPushMatrix()
+        glTranslatef(-(9 + 3), 0, 0)
+        glRotatef(180, 0, 0, 1)
+        glRotatef(self.rightArmAngle1, 1, 0, 0)
+        drawStand(3, 3, 3, 3, 20, 1, 1, 0)
+
+        glPushMatrix()
+        glTranslatef(0, 20, 0)
+        glRotatef(self.rightArmAngle2, 1, 0, 0)
+        drawStand(3, 3, 3, 3, 15, 1, 0, 0)
+        glPopMatrix()
+
+        glPopMatrix()
+
+    def drawLeftArm(self):
+        glPushMatrix()
+        glTranslatef((9 + 3), 0, 0)
+        glRotatef(180, 0, 0, 1)
+        glRotatef(self.leftArmAngle1, 1, 0, 0)
+        drawStand(3, 3, 3, 3, 20, 1, 1, 0)
+
+        glPushMatrix()
+        glTranslatef(0, 20, 0)
+        glRotatef(self.leftArmAngle2, 1, 0, 0)
+        drawStand(3, 3, 3, 3, 15, 1, 0, 0)
+        glPopMatrix()
+
+        glPopMatrix()
+
 
     def draw(self):
         self.drawHead()
-        glPushMatrix()
-        glTranslatef(0, -30, 0)
         self.drawBody()
-        glPopMatrix()
+        self.drawRightArm()
+        self.drawLeftArm()
 
 ironman = IronMan()
 
