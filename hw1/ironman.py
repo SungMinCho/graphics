@@ -152,12 +152,27 @@ def drawStand(a1, b1, a2, b2, h, r, g, b):
     glEnd()
 
 class IronMan:
-    def __init__(self):
+    def init(self):
         self.rightArmAngle1 = 10
         self.rightArmAngle2 = 30
         self.rightArmLaserLength = 1
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
+
+    def __init__(self):
+        self.init()
+
+    def tick(self):
+        if self.rightArmAngle1 == 90:
+            if self.rightArmAngle2 == 0:
+                if self.rightArmLaserLength == 50:
+                    self.init()
+                else:
+                    self.rightArmLaserLength += 1
+            else:
+                self.rightArmAngle2 -= 3
+        else:
+            self.rightArmAngle1 += 20
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
@@ -244,6 +259,10 @@ def display():
     glFlush()
     glutSwapBuffers()
 
+def animate():
+    ironman.tick()
+    glutPostRedisplay()
+
 def reshape(width, height):
     asp = 1
     if height > 0:
@@ -308,7 +327,7 @@ def main():
     glutKeyboardFunc(windowKey)
     glutSpecialFunc(windowSpecial)
     glutCreateMenu(windowMenu)
-    glutIdleFunc(display)
+    glutIdleFunc(animate)
     #glutAddMenuEntry("Toggle Axes [a]", 'a')
     #glutAddMenuEntry("Toggle Values [v]", 'v')
     #glutAddMenuEntry("Toggle Mode [m]", 'm')
