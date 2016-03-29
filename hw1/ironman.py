@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 DEF_D = 5 # D degrees of rotation
-dim = 50.0
+dim = 70.0
 windowName = b"window"
 windowWidth = 1000
 windowHeight = 800
@@ -159,8 +159,15 @@ class IronMan:
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
 
+    def init_leg(self):
+        self.leftLegAngle1 = 30
+        self.leftLegAngle2 = -10
+        self.rightLegAngle1 = -10
+        self.rightLegAngle2 = -10
+
     def __init__(self):
         self.init()
+        self.init_leg()
 
     def tick(self):
         if self.rightArmAngle1 >= 90:
@@ -278,12 +285,35 @@ class IronMan:
 
         glPopMatrix()
 
+    def drawLeftLeg(self):
+        glPushMatrix()
+        glTranslatef(-(9-4), -30, 0)
+        glRotatef(180, 0, 0, 1)
+        glRotatef(self.leftLegAngle1, 1, 0, 0)
+        drawStand(4, 4, 4, 4, 20, 1, 1, 0) 
+        glTranslatef(0, 20, 0)
+        glRotatef(self.leftLegAngle2, 1, 0, 0)
+        drawStand(4, 4, 4, 4, 20, 1, 0, 0)
+        glPopMatrix()
+
+    def drawRightLeg(self):
+        glPushMatrix()
+        glTranslatef(9-4, -30, 0)
+        glRotatef(180, 0, 0, 1)
+        glRotatef(self.rightLegAngle1, 1, 0, 0)
+        drawStand(4, 4, 4, 4, 20, 1, 1, 0)
+        glTranslatef(0, 20, 0)
+        glRotatef(self.rightLegAngle2, 1, 0, 0)
+        drawStand(4, 4, 4, 4, 20, 1, 0, 0)
+        glPopMatrix()
 
     def draw(self):
         self.drawHead()
         self.drawBody()
         self.drawRightArm()
         self.drawLeftArm()
+        self.drawLeftLeg()
+        self.drawRightLeg()
 
 ironman = IronMan()
 
