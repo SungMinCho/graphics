@@ -308,12 +308,15 @@ class IronMan:
         glPopMatrix()
 
     def draw(self):
+        glPushMatrix()
+        glTranslatef(0, 15, 0)
         self.drawHead()
         self.drawBody()
         self.drawRightArm()
         self.drawLeftArm()
         self.drawLeftLeg()
         self.drawRightLeg()
+        glPopMatrix()
 
 ironman = IronMan()
 
