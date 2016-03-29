@@ -156,28 +156,27 @@ class IronMan:
         pass
 
     def drawHead(self):
-#        drawCube(10, 1, 0, 0)
-        drawStand(10, 7, 10, 7, 17, 1, 0, 0)
+        drawStand(7, 5, 7, 5, 17, 1, 0, 0)
 
         glPushMatrix()
         glTranslatef(0, 0, 3)
-        drawCube(8, 1, 1, 0)
+        drawStand(5, 4, 5, 4, 15, 1, 1, 0)
         glPopMatrix()
 
         glPushMatrix()
         glTranslatef(-3, 6, 10)
-        drawCube(2, 1, 1, 1)
+        #drawCube(2, 1, 1, 1)
         glTranslatef(6, 0, 0)
-        drawCube(2, 1, 1, 1)
+        #drawCube(2, 1, 1, 1)
         glPopMatrix()
 
     def drawBody(self):
-        drawStand(13, 10, 13, 10, 30, 1, 0, 0)
+        drawStand(9, 5, 9, 5, 30, 1, 0, 0)
 
         glPushMatrix()
         glTranslatef(0, 20, 0)
         glRotatef(90, 1, 0, 0)
-        drawCylinder(11, 3, 1, 1, 1, 1, 1, 1)
+        drawCylinder(7, 3, 1, 1, 1, 1, 1, 1)
         glPopMatrix()
 
     def draw(self):
