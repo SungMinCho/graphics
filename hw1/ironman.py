@@ -155,6 +155,7 @@ class IronMan:
     def init(self):
         self.rightArmAngle1 = 10
         self.rightArmAngle2 = 30
+        self.rightArmFingerAngle = 90
         self.rightArmLaserLength = 1
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
@@ -172,10 +173,13 @@ class IronMan:
     def tick(self):
         if self.rightArmAngle1 >= 90:
             if self.rightArmAngle2 <= 0:
-                if self.rightArmLaserLength >= 500:
-                    self.init()
+                if self.rightArmFingerAngle > 0:
+                    self.rightArmFingerAngle -= 5
                 else:
-                    self.rightArmLaserLength += 25
+                    if self.rightArmLaserLength >= 500:
+                        self.init()
+                    else:
+                        self.rightArmLaserLength += 25
             else:
                 self.rightArmAngle2 -= 3
         else:
@@ -265,6 +269,37 @@ class IronMan:
 
         glPushMatrix()
         glTranslatef(0, 15, 0)
+
+        glPushMatrix()
+        glTranslatef(0, 0, 2)
+        drawStand(3, 4, 3, 4, 3, 1, 0, 0)
+
+        glPushMatrix()
+        glRotatef(90, 0, 0, 1)
+        glTranslatef(1.5, 3, 0) 
+        glRotatef(-self.rightArmFingerAngle, 0, 0, 1)
+        drawCylinder(3, 2, 1, 1, 0, 1, 1, 0)
+        glTranslatef(0, 3, 0)
+        glRotatef(-self.rightArmFingerAngle, 0, 0, 1)
+        drawCylinder(3, 2, 1, 0, 0, 1, 0, 0)
+        glPopMatrix()
+
+        glRotatef(90, 1, 0, 0)
+        glTranslatef(3, 4, -1.5)
+
+        for finger in range(3):
+            glPushMatrix()
+            glTranslatef(-finger*3, 0, 0)
+            glRotatef(-self.rightArmFingerAngle, 1, 0, 0)
+            drawCylinder(5, 1, 1, 1, 0, 1, 1, 0)
+            glTranslatef(0, 5, 0)
+            glRotatef(-self.rightArmFingerAngle, 1, 0, 0)
+            drawCylinder(5, 1, 1, 0, 0, 1, 0, 0)
+            glPopMatrix()
+
+        glPopMatrix()
+
+        glTranslatef(0, 3, 0)
         drawCylinder(self.rightArmLaserLength, 2, 0, 1, 1, 0, 1, 1)
         glPopMatrix()
         glPopMatrix()
