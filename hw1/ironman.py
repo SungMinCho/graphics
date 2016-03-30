@@ -178,12 +178,17 @@ class IronMan:
                 else:
                     if self.rightArmLaserLength >= 500:
                         self.init()
+                        self.init_leg()
                     else:
                         self.rightArmLaserLength += 25
             else:
                 self.rightArmAngle2 -= 3
+                self.rightLegAngle2 += 3
         else:
             self.rightArmAngle1 += 3
+            self.leftArmAngle1 -= 3
+            self.rightLegAngle1 -= 3
+            self.leftLegAngle1 -= 3
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
