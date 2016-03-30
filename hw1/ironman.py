@@ -323,9 +323,10 @@ def display():
     glFlush()
     glutSwapBuffers()
 
-def animate():
+def animate(value):
     ironman.tick()
     glutPostRedisplay()
+    glutTimerFunc(15, animate, 0)
 
 def reshape(width, height):
     glViewport(0, 0, width, height)
@@ -347,7 +348,8 @@ def main():
     glutReshapeFunc(reshape)
     glutKeyboardFunc(windowKey)
     glutCreateMenu(windowMenu)
-    glutIdleFunc(animate)
+#    glutIdleFunc(animate)
+    glutTimerFunc(15, animate, 0)
 
     glutFullScreen()
     glutMainLoop()
