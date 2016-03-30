@@ -10,9 +10,7 @@ windowName = b"window"
 windowWidth = 1000
 windowHeight = 800
 
-toggleAxes = 0
 toggleValues = 1
-toggleMode = 1
 th = -20
 ph = 20
 fov = 55
@@ -29,82 +27,17 @@ def Sin(th):
 def project():
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-
-    if toggleMode:
-        gluPerspective(fov, asp, dim/4, 4*dim)
-    else:
-        glOrtho(-dim*asp, +dim*asp, -dim, +dim, -dim, dim)
+    
+    gluPerspective(fov, asp, dim/4, 4*dim)
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
 def setEye():
-    if toggleMode:
-        Ex = -2*dim*Sin(th)*Cos(ph)
-        Ey = +2*dim        *Sin(ph)
-        Ez = +2*dim*Cos(th)*Cos(ph)
-        gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0)
-    else:
-        glRotatef(ph, 1, 0, 0)
-        glRotatef(th, 0, 1, 0)
-
-def drawAxes():
-    if toggleAxes:
-        len = 200.0
-        glColor3f(1, 1, 1)
-        glBegin(GL_LINES)
-        glColor3f(1,0,0)
-        glVertex3d(0, 0, 0)
-        glVertex3d(len, 0, 0)
-        glColor3f(0,1,0)
-        glVertex3d(0, 0, 0)
-        glVertex3d(0, len, 0)
-        glColor3f(0,0,1)
-        glVertex3d(0, 0, 0)
-        glVertex3d(0, 0, len)
-        glEnd()
-        # TODO print x y z glRasterPos
-
-def drawValues():
-    if toggleValues:
-        glColor3f(0.8, 0.8, 0.8)
-        # TODO printAt
-
-def vertex(th2, ph2):
-    x = Sin(th2)*Cos(ph2)
-    y = Cos(th2)*Cos(ph2)
-    z =          Sin(ph2)
-    glVertex3d(x, y, z)
-
-def drawCube(radius, red, green, blue):
-    r = radius
-    glColor3f(red, green, blue)
-    glBegin(GL_QUAD_STRIP)
-    glVertex3d(r, 0, r)
-    glVertex3d(r, 2*r, r)
-    glVertex3d(r, 0, -r)
-    glVertex3d(r, 2*r, -r)
-    glVertex3d(-r, 0, -r)
-    glVertex3d(-r, 2*r, -r)
-    glVertex3d(-r, 0, r)
-    glVertex3d(-r, 2*r, r)
-    glVertex3d(r, 0, r)
-    glVertex3d(r, 2*r, r)
-    glEnd()
-
-    glBegin(GL_QUAD_STRIP)
-    glVertex3d(r, 2*r, r)
-    glVertex3d(r, 2*r, -r)
-    glVertex3d(-r, 2*r, r)
-    glVertex3d(-r, 2*r, -r)
-    glEnd()
-
-    glBegin(GL_QUAD_STRIP)
-    glVertex3d(r, 0, r)
-    glVertex3d(r, 0, -r)
-    glVertex3d(-r, 0, r)
-    glVertex3d(-r, 0, -r)
-    glEnd()
+    Ex = -2*dim*Sin(th)*Cos(ph)
+    Ey = +2*dim        *Sin(ph)
+    Ez = +2*dim*Cos(th)*Cos(ph)
+    gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0)
 
 def drawCylinder(height, radius, r, g, b, r2, g2, b2):
     glColor3f(r, g, b)
@@ -166,10 +99,10 @@ class IronMan:
         ph = 20
 
     def init_leg(self):
-        self.leftLegAngle1 = 30
-        self.leftLegAngle2 = -10
-        self.rightLegAngle1 = -10
+        self.rightLegAngle1 = 30
         self.rightLegAngle2 = -10
+        self.leftLegAngle1 = -10
+        self.leftLegAngle2 = -10
 
     def __init__(self):
         self.init()
@@ -193,15 +126,15 @@ class IronMan:
                             self.rightArmBounce = 2 
             else:
                 self.rightArmAngle2 -= 3
-                self.rightLegAngle2 -= 0.5
+                self.leftLegAngle2 -= 0.5
                 self.air += 1
                 #ph -= 1
                 #th -= 1
         else:
             self.rightArmAngle1 += 3
             self.leftArmAngle1 -= 3
-            self.rightLegAngle1 -= 2
             self.leftLegAngle1 -= 2
+            self.rightLegAngle1 -= 2
             self.air += 1
             #ph -= 1
             #th -= 1
@@ -344,7 +277,7 @@ class IronMan:
 
     def drawLeftLeg(self):
         glPushMatrix()
-        glTranslatef(-(9-4), -30, 0)
+        glTranslatef(9-4, -30, 0)
         glRotatef(180, 0, 0, 1)
         glRotatef(self.leftLegAngle1, 1, 0, 0)
         drawStand(4, 4, 4, 4, 20, 1, 1, 0) 
@@ -355,7 +288,7 @@ class IronMan:
 
     def drawRightLeg(self):
         glPushMatrix()
-        glTranslatef(9-4, -30, 0)
+        glTranslatef(-(9-4), -30, 0)
         glRotatef(180, 0, 0, 1)
         glRotatef(self.rightLegAngle1, 1, 0, 0)
         drawStand(4, 4, 4, 4, 20, 1, 1, 0)
@@ -385,9 +318,6 @@ def display():
 
     setEye()
 
-    drawAxes()
-    drawValues()
-
     ironman.draw()
 
     glFlush()
@@ -398,55 +328,12 @@ def animate():
     glutPostRedisplay()
 
 def reshape(width, height):
-    asp = 1
-    if height > 0:
-        width / height
     glViewport(0, 0, width, height)
     project()
 
 def windowKey(key, x, y):
-    global objId, toggleAxes, toggleValues, toggleMode, fov, dim
     if key == b'\x1b':
         exit(0)
-    elif key == b' ':
-        if objId == 2:
-            objId = 0
-        else:
-            objId += 1
-    elif key == b'a':
-        toggleAxes = 1 - toggleAxes
-    elif key == b'v':
-        toggleValues = 1 - toggleValues
-    elif key == b'm':
-        toggleMode = 1 - toggleMode
-    elif key == b'i':
-        fov -= 5
-    elif key == b'o':
-        fov += 5
-    elif key == b'k':
-        dim += 5
-    elif key == b'l':
-        dim -= 5
-
-    project()
-    glutPostRedisplay()
-
-def windowSpecial(key, x, y):
-    global th, ph
-    if key == GLUT_KEY_RIGHT:
-        th += 5
-    elif key == GLUT_KEY_LEFT:
-        th -= 5
-    elif key == GLUT_KEY_UP:
-        ph += 5
-    elif key == GLUT_KEY_DOWN:
-        ph -= 5
-
-    th %= 360
-    ph %= 360
-
-    project()
-    glutPostRedisplay()
 
 def windowMenu(value):
     windowKey(chr(value), 0, 0)
@@ -459,13 +346,8 @@ def main():
     glutDisplayFunc(display)
     glutReshapeFunc(reshape)
     glutKeyboardFunc(windowKey)
-    glutSpecialFunc(windowSpecial)
     glutCreateMenu(windowMenu)
     glutIdleFunc(animate)
-    #glutAddMenuEntry("Toggle Axes [a]", 'a')
-    #glutAddMenuEntry("Toggle Values [v]", 'v')
-    #glutAddMenuEntry("Toggle Mode [m]", 'm')
-    #glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     glutFullScreen()
     glutMainLoop()
