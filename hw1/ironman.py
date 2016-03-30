@@ -157,6 +157,7 @@ class IronMan:
         self.rightArmAngle2 = 30
         self.rightArmFingerAngle = 90
         self.rightArmLaserLength = 1
+        self.rightArmBounce = 0
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
 
@@ -181,6 +182,10 @@ class IronMan:
                         self.init_leg()
                     else:
                         self.rightArmLaserLength += 25
+                        if self.rightArmBounce == 2:
+                            self.rightArmBounce = 0
+                        else:
+                            self.rightArmBounce = 2 
             else:
                 self.rightArmAngle2 -= 3
                 self.rightLegAngle2 += 3
@@ -264,6 +269,7 @@ class IronMan:
         glPushMatrix()
         glTranslatef(-(9 + 3), 0, 0)
         glRotatef(180, 0, 0, 1)
+        glTranslatef(0,0, -self.rightArmBounce)
         glRotatef(self.rightArmAngle1, 1, 0, 0)
         drawStand(3, 3, 3, 3, 20, 1, 1, 0)
 
