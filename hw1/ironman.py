@@ -10,7 +10,7 @@ windowName = b"window"
 windowWidth = 1000
 windowHeight = 800
 
-toggleAxes = 1
+toggleAxes = 0
 toggleValues = 1
 toggleMode = 1
 th = -20
@@ -162,7 +162,7 @@ class IronMan:
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
         self.air = 15
-        th = 0 
+        th = -20 
         ph = 20
 
     def init_leg(self):
@@ -195,16 +195,16 @@ class IronMan:
                 self.rightArmAngle2 -= 3
                 self.rightLegAngle2 += 3
                 self.air += 1
-                ph -= 0.5
-                th -= 1
+                #ph -= 1
+                #th -= 1
         else:
             self.rightArmAngle1 += 3
             self.leftArmAngle1 -= 3
             self.rightLegAngle1 -= 3
             self.leftLegAngle1 -= 3
             self.air += 1
-            ph -= 0.5
-            th -= 1
+            #ph -= 1
+            #th -= 1
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
