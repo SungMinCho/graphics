@@ -193,15 +193,15 @@ class IronMan:
                             self.rightArmBounce = 2 
             else:
                 self.rightArmAngle2 -= 3
-                self.rightLegAngle2 += 3
+                self.rightLegAngle2 -= 0.5
                 self.air += 1
                 #ph -= 1
                 #th -= 1
         else:
             self.rightArmAngle1 += 3
             self.leftArmAngle1 -= 3
-            self.rightLegAngle1 -= 3
-            self.leftLegAngle1 -= 3
+            self.rightLegAngle1 -= 2
+            self.leftLegAngle1 -= 2
             self.air += 1
             #ph -= 1
             #th -= 1
