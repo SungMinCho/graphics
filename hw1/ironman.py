@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 DEF_D = 5 # D degrees of rotation
-dim = 70.0
+dim = 90.0
 windowName = b"window"
 windowWidth = 1000
 windowHeight = 800
@@ -153,6 +153,7 @@ def drawStand(a1, b1, a2, b2, h, r, g, b):
 
 class IronMan:
     def init(self):
+        global th, ph
         self.rightArmAngle1 = 10
         self.rightArmAngle2 = 30
         self.rightArmFingerAngle = 90
@@ -160,6 +161,9 @@ class IronMan:
         self.rightArmBounce = 0
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
+        self.air = 15
+        th = 0 
+        ph = 20
 
     def init_leg(self):
         self.leftLegAngle1 = 30
@@ -172,6 +176,7 @@ class IronMan:
         self.init_leg()
 
     def tick(self):
+        global th, ph
         if self.rightArmAngle1 >= 90:
             if self.rightArmAngle2 <= 0:
                 if self.rightArmFingerAngle > 0:
@@ -189,11 +194,17 @@ class IronMan:
             else:
                 self.rightArmAngle2 -= 3
                 self.rightLegAngle2 += 3
+                self.air += 1
+                ph -= 0.5
+                th -= 1
         else:
             self.rightArmAngle1 += 3
             self.leftArmAngle1 -= 3
             self.rightLegAngle1 -= 3
             self.leftLegAngle1 -= 3
+            self.air += 1
+            ph -= 0.5
+            th -= 1
 
     def drawHead(self):
         drawStand(7, 5, 7, 5, 17, 1, 0, 0)
@@ -355,7 +366,7 @@ class IronMan:
 
     def draw(self):
         glPushMatrix()
-        glTranslatef(0, 15, 0)
+        glTranslatef(0, self.air, 0)
         glScalef(0.7, 1, 1)
         self.drawHead()
         self.drawBody()
