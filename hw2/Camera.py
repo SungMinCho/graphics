@@ -87,7 +87,6 @@ class Camera:
 		self.lasty = y
 
 		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
-		self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
 
 	def drag(self, x, y):
 		if self.mouseLeft:
@@ -101,8 +100,8 @@ class Camera:
 		self.focus = Vector(0, 0, 0)
 
 	def dolly(self, distance):
-		direction = Vector.sub(self.camera, self.focus)
-		direction = Vector.normalize(direction)
+		direction = Vector(0, 0, -1)
+		direction = Quaternion.rotateVector(self.orientation, direction)
 		direction = Vector.scale(distance, direction)
-		self.camera = Vector.add(self.camera, direction)
 		self.focus = Vector.add(self.focus, direction)
+		self.camera = Vector.add(self.camera, direction)

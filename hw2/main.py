@@ -100,11 +100,13 @@ def windowKey(key, x, y):
         fov = max(fov-5, 5)
         fovTarget = fov
     if key == b'k':
-        dim += 10
-        dimTarget = dim
+        camera.dolly(-10)
+        #dim += 10
+        #dimTarget = dim
     if key == b'l':
-        dim = max(dim-10, 10)
-        dimTarget = dim
+        camera.dolly(10)
+        #dim = max(dim-10, 10)
+        #dimTarget = dim
     if key == b's':
         dragHandler.cameraOffsetInit()
         fovTarget = 55
