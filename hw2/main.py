@@ -10,14 +10,14 @@ from quaternion import *
 dim = 90.0
 windowName = b"window"
 windowWidth = 1000
-windowHeight = 800
+windowHeight = 600
 th = 0
 ph = 0
 fov = 55
 asp = 1
 
 ironman = IronMan()
-dragHandler = DragHandler(Quaternion(1, 0, 0, 0))
+dragHandler = DragHandler(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 def project():
     glMatrixMode(GL_PROJECTION)
@@ -39,6 +39,9 @@ def setEye():
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_DEPTH_TEST)
+    glLoadIdentity()
+
+    setEye()
 
     m = Quaternion.makeRotationMatrix(dragHandler.orientation)
     glMultMatrixf(m)

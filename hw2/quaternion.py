@@ -19,7 +19,7 @@ class Vector:
 		return Vector(a.y*b.z - a.z*b.y, a.x*b.z - a.z*b.x, a.x*b.y - a.y*b.x)
 
 	def length(self):
-		return sqrt(Vector.dot(self))
+		return sqrt(Vector.dot(self, self))
 
 	def normalize(v):
 		return Vector.scale(1/v.length(), v)
@@ -80,3 +80,5 @@ class Quaternion:
 		m[15] = 1
 
 		return m
+
+
