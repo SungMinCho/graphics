@@ -14,19 +14,12 @@ windowHeight = 600
 th = 0
 ph = 0
 fov = 55
-asp = 1
+asp = windowWidth / windowHeight
 
 ironman = IronMan()
 dragHandler = DragHandler(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 def project():
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    
-    gluPerspective(fov, asp, dim/4, 4*dim)
-
-    glMatrixMode(GL_MODELVIEW)
-
     setEye()
 
 
@@ -35,6 +28,13 @@ def setEye():
     Ey = +2*dim        *Sin(ph)
     Ez = +2*dim*Cos(th)*Cos(ph)
     gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0)
+
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(fov, asp, dim/4, 4*dim)
+    glTranslatef(dragHandler.cameraOffsetX, dragHandler.cameraOffsetY, 0)
+
+    glMatrixMode(GL_MODELVIEW)
 
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -63,14 +63,16 @@ def windowKey(key, x, y):
     global fov, dim
     if key == b'\x1b':
         exit(0)
-    if key == b'q':
+    if key == b'i':
         fov = min(fov+5, 175)
-    if key == b'w':
+    if key == b'o':
         fov = max(fov-5, 5)
-    if key == b'a':
+    if key == b'k':
         dim += 10
-    if key == b's':
+    if key == b'l':
         dim = max(dim-10, 10)
+    if key == b's':
+        dragHandler.cameraOffsetInit()
     project()
 
 def windowMenu(value):
@@ -79,6 +81,11 @@ def windowMenu(value):
 def mouseEvent(button, state, x, y):
     if state == GLUT_UP:
         dragHandler.mouseWasUp = True
+    if state == GLUT_DOWN:
+        if button == GLUT_LEFT_BUTTON:
+            dragHandler.mouseLeft = True
+        else:
+            dragHandler.mouseLeft = False
 
 def main():
     glutInit(sys.argv)

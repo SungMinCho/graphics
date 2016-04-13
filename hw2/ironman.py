@@ -271,7 +271,7 @@ class IronMan:
     def draw(self):
         glPushMatrix()
         glTranslatef(0, self.air, 0)
-        glScalef(0.7, 1, 1)
+        #glScalef(1, 1, 1)
         self.drawHead()
         self.drawBody()
         self.drawRightArm()

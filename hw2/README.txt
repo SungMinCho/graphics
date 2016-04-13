@@ -12,6 +12,7 @@ RUN:
 
 INSTRUCTIONS:
 
-1. drag around to rotate the trackball
-2. press q or w to zoom out or in
-3. press a or s to dolly out or in
+1. drag around with left click to rotate the trackball
+2. drag around with right click to translate 
+3. press i or o to zoom out or in
+4. press k or l to dolly out or in
