@@ -9,6 +9,9 @@ class Vector:
 	def add(v1, v2):
 		return Vector(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z)
 
+	def sub(v1, v2):
+		return Vector(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z)
+
 	def scale(c, v):
 		return Vector(c*v.x, c*v.y, c*v.z)
 

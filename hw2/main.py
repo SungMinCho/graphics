@@ -6,6 +6,7 @@ from OpenGL.GLUT import *
 from ironman import *
 from DragHandler import *
 from quaternion import *
+from Camera import *
 
 windowName = b"window"
 windowWidth = 1000
@@ -20,9 +21,11 @@ asp = windowWidth / windowHeight
 
 ironman = IronMan()
 dragHandler = DragHandler(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
+camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 def project():
-    setEye()
+    #setEye()
+    camera.lookat()
 
 
 def setEye():
@@ -43,10 +46,11 @@ def display():
     glEnable(GL_DEPTH_TEST)
     glLoadIdentity()
 
-    setEye()
+    #setEye()
+    camera.lookat()
 
-    m = Quaternion.makeRotationMatrix(dragHandler.orientation)
-    glMultMatrixf(m)
+    #m = Quaternion.makeRotationMatrix(dragHandler.orientation)
+    #glMultMatrixf(m)
     ironman.draw()
 
     glFlush()
@@ -113,12 +117,12 @@ def windowMenu(value):
 
 def mouseEvent(button, state, x, y):
     if state == GLUT_UP:
-        dragHandler.mouseWasUp = True
+        camera.mouseWasUp = True
     if state == GLUT_DOWN:
         if button == GLUT_LEFT_BUTTON:
-            dragHandler.mouseLeft = True
+            camera.mouseLeft = True
         else:
-            dragHandler.mouseLeft = False
+            camera.mouseLeft = False
 
 def main():
     glutInit(sys.argv)
@@ -129,7 +133,7 @@ def main():
     glutReshapeFunc(reshape)
     glutKeyboardFunc(windowKey)
     glutMouseFunc(mouseEvent)
-    glutMotionFunc(dragHandler.drag)
+    glutMotionFunc(camera.drag)
     glutCreateMenu(windowMenu)
     glutTimerFunc(15, animate, 0)
 
