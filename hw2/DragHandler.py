@@ -10,7 +10,7 @@ class DragHandler:
         self.mouseWasUp = True
         self.centerx = screenwidth/2
         self.centery = screenheight/2
-        self.radius = min(screenwidth, screenheight)/2
+        self.radius = min(screenwidth, screenheight)/3
         self.radiusSqr = self.radius * self.radius
 
     def vectorFromXY(self, x, y):
@@ -18,6 +18,11 @@ class DragHandler:
         y -= self.centery
         #print(x, y)
         r1_aux = x*x + y*y  # TODO when out of range.
+        if r1_aux >= self.radiusSqr:
+            v = Vector(x, y, 0)
+            v = Vector.normalize(v)
+            v = Vector.scale(self.radius, v)
+            return v
         r1 = sqrt(r1_aux)
         z = sqrt(self.radiusSqr - r1_aux)
         return Vector(x, y, z)
@@ -37,7 +42,7 @@ class DragHandler:
         self.lastv = v2
 
         # calculate n = v1 x v2
-        n = Vector.cross(v1, v2)
+        n = Vector.cross(v2, v1)
         if n.length() == 0:
             return
 
@@ -45,7 +50,8 @@ class DragHandler:
         #n = Quaternion.rotateVector(self.orientation, n)
 
         # rotation = fromAxisAngle(normalize(v3'), v3'.length())
-        rotation = Quaternion.fromAxisAngle(Vector.normalize(n), n.length()/50000)
+        angle = acos(Vector.dot(Vector.normalize(v1), Vector.normalize(v2)))
+        rotation = Quaternion.fromAxisAngle(Vector.normalize(n), angle)
         # orientation = rotation * orientation
         self.orientation = Quaternion.mult(rotation, self.orientation)
 
