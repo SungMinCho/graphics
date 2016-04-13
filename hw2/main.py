@@ -94,11 +94,13 @@ def windowKey(key, x, y):
     if key == b'\x1b':
         exit(0)
     if key == b'i':
-        fov = min(fov+5, 175)
-        fovTarget = fov
+        camera.zoom(5)
+        #fov = min(fov+5, 175)
+        #fovTarget = fov
     if key == b'o':
-        fov = max(fov-5, 5)
-        fovTarget = fov
+        camera.zoom(-5)
+        #fov = max(fov-5, 5)
+        #fovTarget = fov
     if key == b'k':
         camera.dolly(-10)
         #dim += 10

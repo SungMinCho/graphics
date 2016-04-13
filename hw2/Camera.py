@@ -105,3 +105,10 @@ class Camera:
 		direction = Vector.scale(distance, direction)
 		self.focus = Vector.add(self.focus, direction)
 		self.camera = Vector.add(self.camera, direction)
+
+	def zoom(self, angle):
+		self.fov += angle
+		if self.fov > 180:
+			self.fov = 179
+		if self.fov < 0:
+			self.fov = 1
