@@ -7,13 +7,15 @@ from ironman import *
 from DragHandler import *
 from quaternion import *
 
-dim = 90.0
 windowName = b"window"
 windowWidth = 1000
 windowHeight = 600
 th = 0
 ph = 0
 fov = 55
+dim = 90.0
+fovTarget = 55
+dimTarget = 90.0
 asp = windowWidth / windowHeight
 
 ironman = IronMan()
@@ -52,6 +54,30 @@ def display():
 
 def animate(value):
     ironman.tick()
+
+    global fov, dim
+    if fov < fovTarget:
+        if fovTarget - fov < 5:
+            fov = fovTarget
+        else:
+            fov += 2
+    elif fov > fovTarget:
+        if fov - fovTarget < 5:
+            fov = fovTarget
+        else:
+            fov -= 2
+
+    if dim < dimTarget:
+        if dimTarget - dim < 10:
+            dim = dimTarget
+        else:
+            dim += 2
+    elif dim > dimTarget:
+        if dim - dimTarget < 10:
+            dim = dimTarget
+        else:
+            dim -= 2
+
     glutPostRedisplay()
     glutTimerFunc(15, animate, 0)
 
@@ -60,19 +86,26 @@ def reshape(width, height):
     project()
 
 def windowKey(key, x, y):
-    global fov, dim
+    global fov, dim, fovTarget, dimTarget
     if key == b'\x1b':
         exit(0)
     if key == b'i':
         fov = min(fov+5, 175)
+        fovTarget = fov
     if key == b'o':
         fov = max(fov-5, 5)
+        fovTarget = fov
     if key == b'k':
         dim += 10
+        dimTarget = dim
     if key == b'l':
         dim = max(dim-10, 10)
+        dimTarget = dim
     if key == b's':
         dragHandler.cameraOffsetInit()
+        fovTarget = 55
+        dimTarget = 90
+        # TODO. this should do see all
     project()
 
 def windowMenu(value):

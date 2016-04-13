@@ -67,8 +67,8 @@ class DragHandler:
             self.lastx = x
             self.lasty = y
             return
-        self.cameraOffsetX += x - self.lastx
-        self.cameraOffsetY -= y - self.lasty
+        self.cameraOffsetX += (x - self.lastx)/2
+        self.cameraOffsetY -= (y - self.lasty)/2
         self.lastx = x
         self.lasty = y
 
