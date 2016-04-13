@@ -110,9 +110,10 @@ def windowKey(key, x, y):
         #dim = max(dim-10, 10)
         #dimTarget = dim
     if key == b's':
-        dragHandler.cameraOffsetInit()
-        fovTarget = 55
-        dimTarget = 90
+        camera.reset()
+        #dragHandler.cameraOffsetInit()
+        #fovTarget = 55
+        #dimTarget = 90
         # TODO. this should do see all
     project()
 

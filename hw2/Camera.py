@@ -95,9 +95,9 @@ class Camera:
 			self.dragRight(x, y)
 
 	def reset(self):
-		self.camera = Vector(0, 0, self.dim)
-		self.up = Vector(0, 1, 0)
 		self.focus = Vector(0, 0, 0)
+		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
+		self.fov = 55
 
 	def dolly(self, distance):
 		direction = Vector(0, 0, -1)
