@@ -4,40 +4,13 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-DEF_D = 5 # D degrees of rotation
-dim = 90.0
-windowName = b"window"
-windowWidth = 1000
-windowHeight = 800
-
-toggleValues = 1
-th = -20
-ph = 20
-fov = 55
-asp = 1
-
-objId = 1
+DEF_D = 5
 
 def Cos(th):
     return cos(pi/180*th)
 
 def Sin(th):
     return sin(pi/180*th)
-
-def project():
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    
-    gluPerspective(fov, asp, dim/4, 4*dim)
-
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-
-def setEye():
-    Ex = -2*dim*Sin(th)*Cos(ph)
-    Ey = +2*dim        *Sin(ph)
-    Ez = +2*dim*Cos(th)*Cos(ph)
-    gluLookAt(Ex, Ey, Ez, 0, 0, 0, 0, Cos(ph), 0)
 
 def drawCylinder(height, radius, r, g, b, r2, g2, b2):
     glColor3f(r, g, b)
@@ -95,8 +68,6 @@ class IronMan:
         self.leftArmAngle1 = 10
         self.leftArmAngle2 = 30
         self.air = 15
-        th = -20 
-        ph = 20
 
     def init_leg(self):
         self.rightLegAngle1 = 30
@@ -309,51 +280,3 @@ class IronMan:
         self.drawRightLeg()
         glPopMatrix()
 
-ironman = IronMan()
-
-def display():
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glEnable(GL_DEPTH_TEST)
-    glLoadIdentity()
-
-    setEye()
-
-    ironman.draw()
-
-    glFlush()
-    glutSwapBuffers()
-
-def animate(value):
-    ironman.tick()
-    glutPostRedisplay()
-    glutTimerFunc(15, animate, 0)
-
-def reshape(width, height):
-    glViewport(0, 0, width, height)
-    project()
-
-def windowKey(key, x, y):
-    if key == b'\x1b':
-        exit(0)
-
-def windowMenu(value):
-    windowKey(chr(value), 0, 0)
-
-def main():
-    glutInit(sys.argv)
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
-    glutInitWindowSize(windowWidth, windowHeight)
-    glutCreateWindow(windowName)
-    glutDisplayFunc(display)
-    glutReshapeFunc(reshape)
-    glutKeyboardFunc(windowKey)
-    glutCreateMenu(windowMenu)
-#    glutIdleFunc(animate)
-    glutTimerFunc(15, animate, 0)
-
-    glutFullScreen()
-    glutMainLoop()
-    return 0
-
-if __name__ == "__main__":
-    main()
