@@ -60,8 +60,18 @@ def reshape(width, height):
     project()
 
 def windowKey(key, x, y):
+    global fov, dim
     if key == b'\x1b':
         exit(0)
+    if key == b'q':
+        fov = min(fov+5, 175)
+    if key == b'w':
+        fov = max(fov-5, 5)
+    if key == b'a':
+        dim += 10
+    if key == b's':
+        dim = max(dim-10, 10)
+    project()
 
 def windowMenu(value):
     windowKey(chr(value), 0, 0)

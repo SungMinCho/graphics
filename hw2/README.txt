@@ -8,4 +8,10 @@ SETUP :
 
 RUN:
 
-4. python3 ironman.py
+4. python3 main.py
+
+INSTRUCTIONS:
+
+1. drag around to rotate the trackball
+2. press q or w to zoom out or in
+3. press a or s to dolly out or in
