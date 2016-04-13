@@ -13,7 +13,7 @@ class Camera:
 		self.orientation = orientation
 		self.focus = Vector(0, 0, 0)
 		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
-		self.up = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 1, 0)))
+		self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
 		self.zNear = self.dim/4
 		self.zFar = self.dim*4
 
@@ -66,10 +66,28 @@ class Camera:
 		self.orientation = Quaternion.mult(rotation, self.orientation)
 
 		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
-		self.up = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 1, 0)))
+		self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
 
 	def dragRight(self, x, y):
-		pass
+		if self.mouseWasUp:
+			self.mouseWasUp = False
+			self.lastx = x
+			self.lasty = y
+			return
+
+		right = Vector(1, 0, 0)
+		right = Quaternion.rotateVector(self.orientation, right)
+		up = Vector(0, 1, 0)
+		up = Quaternion.rotateVector(self.orientation, up)
+
+		self.focus = Vector.add(self.focus, Vector.scale(-(x-self.lastx), right))
+		self.focus = Vector.add(self.focus, Vector.scale(y-self.lasty, up))
+
+		self.lastx = x
+		self.lasty = y
+
+		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
+		self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
 
 	def drag(self, x, y):
 		if self.mouseLeft:
@@ -88,13 +106,3 @@ class Camera:
 		direction = Vector.scale(distance, direction)
 		self.camera = Vector.add(self.camera, direction)
 		self.focus = Vector.add(self.focus, direction)
-
-	def translate(self, x, y):
-		self.focus = Vector.add(self.focus, Vector.scale(y, self.up))
-		self.camera = Vector.add(self.camera, Vector.scale(y, self.up))
-
-		look = Vector.sub(self.focus, self.camera)
-		xdir = Vector.normalize(Vector.cross(self.up, self.look))
-
-		self.focus = Vector.add(self.focus, Vector.scale(x, xdir))
-		self.camera = Vector.add(self.camera, Vector.scale(x, xdir))
