@@ -6,6 +6,8 @@ from OpenGL.GLUT import *
 
 DEF_D = 5
 
+points = []
+
 def Cos(th):
     return cos(pi/180*th)
 
@@ -13,6 +15,9 @@ def Sin(th):
     return sin(pi/180*th)
 
 def drawCylinder(height, radius, r, g, b, r2, g2, b2):
+    global points
+    points.append(gluProject(0, 0, 0))
+    points.append(gluProject(0, height, 0))
     glColor3f(r, g, b)
     glBegin(GL_QUAD_STRIP)
     for j in range(0, 361, DEF_D):
@@ -29,6 +34,15 @@ def drawCylinder(height, radius, r, g, b, r2, g2, b2):
         glEnd()
 
 def drawStand(a1, b1, a2, b2, h, r, g, b):
+    global points
+    points.append(gluProject(a1, h, b1))
+    points.append(gluProject(a1, h, -b1))
+    points.append(gluProject(-a1, h, b1))
+    points.append(gluProject(-a1, h, -b1))
+    points.append(gluProject(a2, 0, b2))
+    points.append(gluProject(a2, 0, -b2))
+    points.append(gluProject(-a2, 0, b2))
+    points.append(gluProject(-a2, 0, -b2))
     glColor3f(r, g, b)
     glBegin(GL_QUAD_STRIP)
     glVertex3d(a1, h, b1)
@@ -78,6 +92,7 @@ class IronMan:
     def __init__(self):
         self.init()
         self.init_leg()
+        self.points = None
 
     def tick(self):
         global th, ph
@@ -269,6 +284,8 @@ class IronMan:
         glPopMatrix()
 
     def draw(self):
+        global points
+        points = []
         glPushMatrix()
         glTranslatef(0, self.air, 0)
         #glScalef(1, 1, 1)
@@ -279,4 +296,6 @@ class IronMan:
         self.drawLeftLeg()
         self.drawRightLeg()
         glPopMatrix()
+        self.points = points
+        #print(len(self.points))
 

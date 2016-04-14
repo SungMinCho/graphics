@@ -16,4 +16,5 @@ INSTRUCTIONS:
 2. drag around with right click to translate
 3. press i or o to zoom out or in
 4. press k or l to dolly out or in
-5. press s to see all
+5. press r to see all
+6. press s to seek to where mouse is at

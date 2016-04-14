@@ -108,7 +108,19 @@ class Camera:
 
 	def zoom(self, angle):
 		self.fov += angle
-		if self.fov > 180:
+		if self.fov >= 180:
 			self.fov = 179
-		if self.fov < 0:
+		if self.fov <= 0:
 			self.fov = 1
+
+	def seek(self, x, y, points):
+		mindist = 99999999999999999
+		targetpoint = None
+		for point in points:
+			dist = (point[0] - x)*(point[0] - x) + (point[1] - y)*(point[1] - y)
+			if dist < mindist:
+				mindist = dist
+				targetpoint = point
+		(px, py, pz) = gluUnProject(targetpoint[0], targetpoint[1], targetpoint[2])
+		self.focus = Vector(px, py, pz)
+		self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))

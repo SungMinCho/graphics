@@ -109,12 +109,14 @@ def windowKey(key, x, y):
         camera.dolly(10)
         #dim = max(dim-10, 10)
         #dimTarget = dim
-    if key == b's':
+    if key == b'r':
         camera.reset()
         #dragHandler.cameraOffsetInit()
         #fovTarget = 55
         #dimTarget = 90
         # TODO. this should do see all
+    if key == b's':
+        camera.seek(x, y, ironman.points)
     project()
 
 def windowMenu(value):
@@ -126,7 +128,7 @@ def mouseEvent(button, state, x, y):
     if state == GLUT_DOWN:
         if button == GLUT_LEFT_BUTTON:
             camera.mouseLeft = True
-        else:
+        elif button == GLUT_RIGHT_BUTTON:
             camera.mouseLeft = False
 
 def main():
