@@ -117,7 +117,7 @@ class Camera:
 		mindist = 99999999999999999
 		targetpoint = None
 		for point in points:
-			dist = (point[0] - x)*(point[0] - x) + (point[1] - y)*(point[1] - y)
+			dist = (point[0] - x)*(point[0] - x) + (point[1] + y)*(point[1] + y) # reverse y because opengl is y= 0 at bottom
 			if dist < mindist:
 				mindist = dist
 				targetpoint = point

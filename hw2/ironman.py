@@ -35,14 +35,16 @@ def drawCylinder(height, radius, r, g, b, r2, g2, b2):
 
 def drawStand(a1, b1, a2, b2, h, r, g, b):
     global points
-    points.append(gluProject(a1, h, b1))
-    points.append(gluProject(a1, h, -b1))
-    points.append(gluProject(-a1, h, b1))
-    points.append(gluProject(-a1, h, -b1))
-    points.append(gluProject(a2, 0, b2))
-    points.append(gluProject(a2, 0, -b2))
-    points.append(gluProject(-a2, 0, b2))
-    points.append(gluProject(-a2, 0, -b2))
+    for i in [0, 0.2, 0.4, 0.6, 0.8, 1]:
+        x = a1*i + a2*(1-i)
+        y = h*i
+        z = b1*i + b2*(1-i)
+        points.append(gluProject(x, y, z))
+        points.append(gluProject(x, y, -z))
+        points.append(gluProject(-x, y, z))
+        points.append(gluProject(-x, y, -z))
+        points.append(gluProject(0, y, 0))
+
     glColor3f(r, g, b)
     glBegin(GL_QUAD_STRIP)
     glVertex3d(a1, h, b1)
@@ -95,6 +97,7 @@ class IronMan:
         self.points = None
 
     def tick(self):
+        return
         global th, ph
         if self.rightArmAngle1 >= 90:
             if self.rightArmAngle2 <= 0:

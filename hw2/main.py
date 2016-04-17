@@ -4,7 +4,6 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from ironman import *
-from DragHandler import *
 from quaternion import *
 from Camera import *
 
@@ -20,7 +19,6 @@ dimTarget = 90.0
 asp = windowWidth / windowHeight
 
 ironman = IronMan()
-dragHandler = DragHandler(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 def project():
