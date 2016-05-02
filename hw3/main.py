@@ -199,7 +199,7 @@ def parse():
         first = crossSections[0]
         last = crossSections[-1]
 
-        crossSections = [first,first,first] + crossSections + [last, last, last]
+        crossSections = [first] + crossSections + [last]
 
         global catmullCrossSections
         l = len(crossSections)
@@ -230,6 +230,7 @@ def display():
     #for c in crossSections:
     #    closedCurve(c)
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     l = len(catmullCrossSections)
     l = 1 / l
