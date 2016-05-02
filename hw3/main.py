@@ -196,6 +196,11 @@ def parse():
 
             crossSections.append(crossSection)
 
+        first = crossSections[0]
+        last = crossSections[-1]
+
+        crossSections = [first,first,first] + crossSections + [last, last, last]
+
         global catmullCrossSections
         l = len(crossSections)
         for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
@@ -226,14 +231,19 @@ def display():
     #    closedCurve(c)
 
 
-    glColor3f(0, 1, 0)
+    l = len(catmullCrossSections)
+    l = 1 / l
+    (R, G, B) = (0, 1, 0)
     prev = None
     for c in catmullCrossSections:
+        glColor3f(R,G,B)
         if prev == None:
             prev = c
             continue
         drawMesh(prev, c)
         prev = c
+        R += l
+        G -= l
 
 
     glFlush()
