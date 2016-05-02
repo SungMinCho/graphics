@@ -45,13 +45,18 @@ class CrossSection:
         self.axis = axis
         self.translation = translation
 
+        self.orientation = Quaternion.fromAxisAngle(axis, angle)
+
+        self.update()
+
+    def update(self):
         # calculate points on curve with the matrix multiplied
         realPoints = []
-        for i in range(len(controlPoints)):
-            p1 = controlPoints[i]
-            p2 = controlPoints[(i+1) % len(controlPoints)]
-            p3 = controlPoints[(i+2) % len(controlPoints)]
-            p4 = controlPoints[(i+3) % len(controlPoints)]
+        for i in range(len(self.controlPoints)):
+            p1 = self.controlPoints[i]
+            p2 = self.controlPoints[(i+1) % len(self.controlPoints)]
+            p3 = self.controlPoints[(i+2) % len(self.controlPoints)]
+            p4 = self.controlPoints[(i+3) % len(self.controlPoints)]
 
             T = 5 # determines the number of knots
             for uI in range(0, T+1):
@@ -78,9 +83,9 @@ class CrossSection:
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         glPushMatrix()
-        glTranslatef(translation.x, translation.y, translation.z)
-        glRotatef(angle, axis.x, axis.y, axis.z)
-        glScalef(scale, scale, scale)
+        glTranslatef(self.translation.x, self.translation.y, self.translation.z)
+        glRotatef(self.angle, self.axis.x, self.axis.y, self.axis.z)
+        glScalef(self.scale, self.scale, self.scale)
         m = glGetDoublev(GL_MODELVIEW_MATRIX)
         glPopMatrix()
 
@@ -156,10 +161,14 @@ def linesToStreamDisregardingComments(lines):
 
 def updateCrossSections():
     global catmullCrossSections
+
+    cs = copy.deepcopy(crossSections)
+    cs = [cs[0]] + cs + [cs[-1]]
+
     catmullCrossSections = []
-    l = len(crossSections)
+    l = len(cs)
     for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
-        for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
+        for c in crossSectionCatmullRom(cs[i], cs[i+1], cs[i+2], cs[i+3]):
             catmullCrossSections.append(c)
 
 def init():
@@ -232,13 +241,14 @@ def windowKey(key, x, y):
         camera.dolly(10)
     if key == b'r':
         camera.reset()
-    if key == b's':
-        isBspline = not isBspline
     if key == b'c':
         crossSections.append(copy.deepcopy(crossSections[-1]))
-        crossSections[-1].translation.y += 10
+        last = crossSections[-1]
+        v = last.orientation.rotateVector(Vector(0, 1, 0))
+        last.translation = last.translation + v
         focussection = len(crossSections) - 1
         focussectionpoint = 0
+        crossSections[-1].update()
         updateCrossSections()
         #glutPostRedisplay()
     if key == b'p':
@@ -247,6 +257,44 @@ def windowKey(key, x, y):
         focussection -= 1
     if key == b'e':
         focussection += 1
+    if key == b'w':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(0, 1, 0))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+    if key == b's':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(0, -1, 0))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+    if key == b'a':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(-1, 0, 0))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+    if key == b'd':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(1, 0, 0))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+    if key == b'z':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(0, 0, 1))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+    if key == b'x':
+        c = crossSections[focussection]
+        v = c.orientation.rotateVector(Vector(0, 0, -1))
+        c.translation = c.translation + v
+        c.update()
+        updateCrossSections()
+
+    glutPostRedisplay()
     project()
 
 def windowMenu(value):
