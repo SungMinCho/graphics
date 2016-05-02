@@ -20,10 +20,11 @@ asp = windowWidth / windowHeight
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 class CrossSection:
-    def __init__(self, controlPoints, scale, rotation, translation):
+    def __init__(self, controlPoints, scale, angle, axis, translation):
         self.controlPoints = controlPoints
         self.scale = scale
-        self.rotation = rotation
+        self.angle = angle
+        self.axis = axis
         self.translation = translation
 
 isBspline = True
@@ -84,33 +85,32 @@ def parse():
             axisy = float(words.__next__())
             axisz = float(words.__next__())
             axis = Vector(axisx, axisy, axisz)
-            rotation = Quaternion.fromAxisAngle(axis, angle)
 
             positionx = float(words.__next__())
             positiony = float(words.__next__())
             positionz = float(words.__next__())
-            translation = (positionx, positiony, positionz)
+            translation = Vector(positionx, positiony, positionz)
 
-            crossSection = CrossSection(points, scale, rotation, translation)
+            crossSection = CrossSection(points, scale, angle, axis, translation)
 
             crossSections.append(crossSection)
 
 
 def closedCurve(c): # c is of type CrossSection
     glPushMatrix()
-    glTranslatef(c.translation[0], c.translation[1], c.translation[2])
-    glMultMatrixf(Quaternion.makeRotationMatrix(c.rotation))
+    glTranslatef(c.translation.x, c.translation.y, c.translation.z)
+    glRotatef(c.angle, c.axis.x, c.axis.y, c.axis.z)
     glScalef(c.scale, c.scale, c.scale)
 
     # control lines. for comparison with the actual curve
-    for i in range(len(c.controlPoints)):
-        glBegin(GL_LINE_STRIP)
-        glColor3f(1, 1, 1)
-        p = c.controlPoints[i]
-        q = c.controlPoints[(i+1) % len(c.controlPoints)]
-        glVertex3f(p[0], 0, p[1])
-        glVertex3f(q[0], 0, q[1])
-        glEnd()
+    #for i in range(len(c.controlPoints)):
+    #    glBegin(GL_LINE_STRIP)
+    #    glColor3f(1, 1, 1)
+    #    p = c.controlPoints[i]
+    #    q = c.controlPoints[(i+1) % len(c.controlPoints)]
+    #    glVertex3f(p[0], 0, p[1])
+    #    glVertex3f(q[0], 0, q[1])
+    #    glEnd()
 
     """for point in c.controlPoints:
         glBegin(GL_POINTS)
@@ -128,7 +128,7 @@ def closedCurve(c): # c is of type CrossSection
         p4 = c.controlPoints[(i+3) % len(c.controlPoints)]
 
         glBegin(GL_LINE_STRIP)
-        T = 10 # determines the number of knots
+        T = 5 # determines the number of knots
         for uI in range(0, T+1):
             u = uI / T
             u2 = u*u
@@ -191,23 +191,19 @@ def crossSectionCatmullRom(c1, c2, c3, c4):
         scale = f1*c1.scale + f2*c2.scale + f3*c3.scale + f4*c4.scale
 
         # rotation
-        # TODO
-        rotation = c1.rotation
+        angle = f1*c1.angle + f2*c2.angle + f3*c3.angle + f4*c4.angle
+        axis = f1*c1.axis + f2*c2.axis + f3*c3.axis + f4*c4.axis
 
 
         # translation
-        (x1, y1, z1) = c1.translation
-        (x2, y2, z2) = c2.translation
-        (x3, y3, z3) = c3.translation
-        (x4, y4, z4) = c4.translation
+        t1 = c1.translation
+        t2 = c2.translation
+        t3 = c3.translation
+        t4 = c4.translation
 
-        x = f1*x1 + f2*x2 + f3*x3 + f4*x4
-        y = f1*y1 + f2*y2 + f3*y3 + f4*y4
-        z = f1*z1 + f2*z2 + f3*z3 + f4*z4
+        translation = f1*t1 + f2*t2 + f3*t3 + f4*t4
 
-        translation = (x, y, z)
-
-        yield CrossSection(ps, scale, rotation, translation)
+        yield CrossSection(ps, scale, angle, axis, translation)
 
 def project():
     camera.lookat()

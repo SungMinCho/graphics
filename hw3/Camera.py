@@ -7,7 +7,7 @@ from math import *
 class Camera:
     # eye = focus + (0, 0, dim) * orientation
     def __init__(self, orientation, width, height):
-        self.dim = 40
+        self.dim = 100
         self.fov = 55
         self.asp = width / height
         self.orientation = orientation
@@ -96,13 +96,13 @@ class Camera:
 
     def reset(self):
         self.focus = Vector(0, 0, 0)
-        self.camera = Vector.add(self.focus, self.orientation.rotateVector(Vector(0, 0, self.dim)))
+        self.camera = self.focus + self.orientation.rotateVector(0, 0, self.dim)
         self.fov = 55
 
     def dolly(self, distance):
         direction = Vector(0, 0, -1)
         direction = self.orientation.rotateVector(direction)
-        direction = Vector.scale(distance, direction)
+        direction = distance * direction
         self.focus = self.focus + direction
         self.camera = self.camera + direction
 
