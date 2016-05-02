@@ -6,14 +6,17 @@ class Vector:
         self.y = y
         self.z = z
 
-    def add(v1, v2):
-        return Vector(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z)
+    def __add__(self, v2):
+        return Vector(self.x+v2.x, self.y+v2.y, self.z+v2.z)
 
-    def sub(v1, v2):
-        return Vector(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z)
+    def __sub__(self, v2):
+        return Vector(self.x-v2.x, self.y-v2.y, self.z-v2.z)
 
-    def scale(c, v):
-        return Vector(c*v.x, c*v.y, c*v.z)
+    def __mul__(self, c):
+        return Vector(c*self.x, c*self.y, c*self.z)
+
+    def __rmul__(self, c):
+        return Vector(c*self.x, c*self.y, c*self.z)
 
     def dot(v1, v2):
         return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
@@ -24,8 +27,8 @@ class Vector:
     def length(self):
         return sqrt(Vector.dot(self, self))
 
-    def normalize(v):
-        return Vector.scale(1/v.length(), v)
+    def normalize(self):
+        return (1/self.length()) * self
 
 class Quaternion:
     def __init__(self, w, x, y, z):
@@ -37,28 +40,28 @@ class Quaternion:
     def fromAxisAngle(axis, angle):
         return Quaternion(cos(angle/2.0), axis.x*sin(angle/2.0), axis.y*sin(angle/2.0), axis.z*sin(angle/2.0))
 
-    def mult(a, b):
-        return Quaternion(a.w*b.w - a.x*b.x - a.y*b.y - a.z*b.z,
-                                            a.w*b.x + a.x*b.w + a.y*b.z - a.z*b.y,
-                                            a.w*b.y - a.x*b.z + a.y*b.w + a.z*b.x,
-                                            a.w*b.z + a.x*b.y - a.y*b.x + a.z*b.w)
+    def __mul__(self, b):
+        return Quaternion(self.w*b.w - self.x*b.x - self.y*b.y - self.z*b.z,
+                          self.w*b.x + self.x*b.w + self.y*b.z - self.z*b.y,
+                          self.w*b.y - self.x*b.z + self.y*b.w + self.z*b.x,
+                          self.w*b.z + self.x*b.y - self.y*b.x + self.z*b.w)
 
-    def conjugate(q):
-        return Quaternion(q.w, -q.x, -q.y, -q.z)
 
-    def rotateVector(q, v):
+    def conjugate(self):
+        return Quaternion(self.w, -self.x, -self.y, -self.z)
+
+    def rotateVector(self, v):
         vq = Quaternion(0, v.x, v.y, v.z)
-        vq = Quaternion.mult(q, vq)
-        vq = Quaternion.mult(vq, Quaternion.conjugate(q))
+        vq = self * vq * self.conjugate()
         return Vector(vq.x, vq.y, vq.z)
 
-    def makeRotationMatrix(q):
+    def makeRotationMatrix(self):
         x = Vector(1, 0, 0)
         y = Vector(0, 1, 0)
         z = Vector(0, 0, 1)
-        xt = Quaternion.rotateVector(q, x)
-        yt = Quaternion.rotateVector(q, y)
-        zt = Quaternion.rotateVector(q, z)
+        xt = self.rotateVector(x)
+        yt = self.rotateVector(y)
+        zt = self.rotateVector(z)
 
         m = [0] * 16
 

@@ -12,8 +12,8 @@ class Camera:
         self.asp = width / height
         self.orientation = orientation
         self.focus = Vector(0, 0, 0)
-        self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
-        self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
+        self.camera = self.focus + self.orientation.rotateVector(Vector(0, 0, self.dim))
+        self.up = self.orientation.rotateVector(Vector(0, 1, 0))
         self.zNear = self.dim/4
         self.zFar = self.dim*4
 
@@ -30,8 +30,8 @@ class Camera:
         r1_aux = x*x + y*y
         if r1_aux >= self.radiusSqr:
             v = Vector(x, y, 0)
-            v = Vector.normalize(v)
-            v = Vector.scale(self.radius, v)
+            v = v.normalize()
+            v = self.radius * v
             return v
         r1 = sqrt(r1_aux)
         z = sqrt(self.radiusSqr - r1_aux)
@@ -60,13 +60,13 @@ class Camera:
         n = Vector.cross(v1, v2)
         if n.length() == 0:
             return
-        n = Quaternion.rotateVector(self.orientation, n)
-        angle = acos(Vector.dot(Vector.normalize(v1), Vector.normalize(v2)))
+        n = self.orientation.rotateVector(n)
+        angle = acos(Vector.dot(v1.normalize(), v2.normalize()))
         rotation = Quaternion.fromAxisAngle(Vector.normalize(n), angle)
-        self.orientation = Quaternion.mult(rotation, self.orientation)
+        self.orientation = rotation * self.orientation
 
-        self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
-        self.up = Quaternion.rotateVector(self.orientation, Vector(0, 1, 0))
+        self.camera = self.focus + self.orientation.rotateVector(Vector(0, 0, self.dim))
+        self.up = self.orientation.rotateVector(Vector(0, 1, 0))
 
     def dragRight(self, x, y):
         if self.mouseWasUp:
@@ -76,17 +76,17 @@ class Camera:
             return
 
         right = Vector(1, 0, 0)
-        right = Quaternion.rotateVector(self.orientation, right)
+        right = self.orientation.rotateVector(right)
         up = Vector(0, 1, 0)
-        up = Quaternion.rotateVector(self.orientation, up)
+        up = self.orientation.rotateVector(up)
 
-        self.focus = Vector.add(self.focus, Vector.scale(-(x-self.lastx), right))
-        self.focus = Vector.add(self.focus, Vector.scale(y-self.lasty, up))
+        self.focus = self.focus + (-(x-self.lastx) * right)
+        self.focus = self.focus + ((y-self.lasty) * up)
 
         self.lastx = x
         self.lasty = y
 
-        self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
+        self.camera = self.focus + self.orientation.rotateVector(Vector(0, 0, self.dim))
 
     def drag(self, x, y):
         if self.mouseLeft:
@@ -96,15 +96,15 @@ class Camera:
 
     def reset(self):
         self.focus = Vector(0, 0, 0)
-        self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
+        self.camera = Vector.add(self.focus, self.orientation.rotateVector(Vector(0, 0, self.dim)))
         self.fov = 55
 
     def dolly(self, distance):
         direction = Vector(0, 0, -1)
-        direction = Quaternion.rotateVector(self.orientation, direction)
+        direction = self.orientation.rotateVector(direction)
         direction = Vector.scale(distance, direction)
-        self.focus = Vector.add(self.focus, direction)
-        self.camera = Vector.add(self.camera, direction)
+        self.focus = self.focus + direction
+        self.camera = self.camera + direction
 
     def zoom(self, angle):
         self.fov += angle
@@ -123,4 +123,4 @@ class Camera:
                 targetpoint = point
         (px, py, pz) = gluUnProject(targetpoint[0], targetpoint[1], targetpoint[2])
         self.focus = Vector(px, py, pz)
-        self.camera = Vector.add(self.focus, Quaternion.rotateVector(self.orientation, Vector(0, 0, self.dim)))
+        self.camera = self.focus + self.orientation.rotateVector(Vector(0, 0, self.dim))
