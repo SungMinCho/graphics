@@ -96,7 +96,7 @@ class Camera:
 
     def reset(self):
         self.focus = Vector(0, 0, 0)
-        self.camera = self.focus + self.orientation.rotateVector(0, 0, self.dim)
+        self.camera = self.focus + self.orientation.rotateVector(Vector(0, 0, self.dim))
         self.fov = 55
 
     def dolly(self, distance):

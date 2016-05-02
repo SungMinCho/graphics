@@ -5,6 +5,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from quaternion import *
 from Camera import *
+import copy
 
 windowName = b"window"
 windowWidth = 1000
@@ -23,6 +24,9 @@ crossSectionsNum = 0
 controlPointsNum = 0
 
 catmullCrossSections = []
+
+focussection = 0
+focussectionpoint = 0
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
@@ -71,6 +75,8 @@ class CrossSection:
 
                 realPoints.append((x, z))
 
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
         glPushMatrix()
         glTranslatef(translation.x, translation.y, translation.z)
         glRotatef(angle, axis.x, axis.y, axis.z)
@@ -148,66 +154,19 @@ def linesToStreamDisregardingComments(lines):
                 continue
             yield word
 
-def parse():
-    if(len(sys.argv) <= 1):
-        print("usage : python3 main.py [inputfile path]")
-        exit()
+def updateCrossSections():
+    global catmullCrossSections
+    catmullCrossSections = []
+    l = len(crossSections)
+    for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
+        for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
+            catmullCrossSections.append(c)
 
-    filename = sys.argv[1]
-    with open(filename, 'r') as f:
-        words = linesToStreamDisregardingComments(f.readlines())
+def init():
+    global crossSections
+    first = CrossSection([(0,0),(10,0),(10,10),(0,10)], 1, 0, Vector(1, 0, 0), Vector(0, 0, 0))
+    crossSections.append(first)
 
-        global isBspline
-        spline = words.__next__()
-        if spline == "BSPLINE":
-            isBspline = True
-        elif spline == "CATMULL_ROM":
-            isBspline = False
-        else:
-            print("spline should be either 'BSPLINE' or 'CATMULL_ROM'")
-            exit()
-
-        global crossSectionsNum
-        global controlPointsNum
-        crossSectionsNum = int(words.__next__())
-        controlPointsNum = int(words.__next__())
-
-        global crossSections
-        for i in range(crossSectionsNum):
-            points = []
-            for j in range(controlPointsNum):
-                x = float(words.__next__())
-                z = float(words.__next__())
-                points.append((x, z))
-            scale = float(words.__next__())
-
-            angle = float(words.__next__())
-            axisx = float(words.__next__())
-            axisy = float(words.__next__())
-            axisz = float(words.__next__())
-            axis = Vector(axisx, axisy, axisz)
-
-            positionx = float(words.__next__())
-            positiony = float(words.__next__())
-            positionz = float(words.__next__())
-            translation = Vector(positionx, positiony, positionz)
-
-            crossSection = CrossSection(points, scale, angle, axis, translation)
-
-            crossSections.append(crossSection)
-
-        first = crossSections[0]
-        last = crossSections[-1]
-
-        crossSections = [first] + crossSections + [last]
-
-        global catmullCrossSections
-        l = len(crossSections)
-        for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
-            prev = None
-            for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
-                catmullCrossSections.append(c)
- 
 def drawMesh(c1, c2): # c1, c2 is CrossSection
     glBegin(GL_TRIANGLE_STRIP)
     for (p1, p2) in list(zip(c1.realPoints, c2.realPoints)) + [(c1.realPoints[0], c2.realPoints[0])]:
@@ -233,7 +192,8 @@ def display():
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     l = len(catmullCrossSections)
-    l = 1 / l
+    if l != 0:
+        l = 1 / l
     (R, G, B) = (0, 1, 0)
     prev = None
     for c in catmullCrossSections:
@@ -259,7 +219,7 @@ def reshape(width, height):
     project()
 
 def windowKey(key, x, y):
-    global fov, dim, fovTarget, dimTarget, isBspline
+    global fov, dim, fovTarget, dimTarget, isBspline, crossSections, focussection, focussectionpoint
     if key == b'\x1b':
         exit(0)
     if key == b'i':
@@ -274,6 +234,19 @@ def windowKey(key, x, y):
         camera.reset()
     if key == b's':
         isBspline = not isBspline
+    if key == b'c':
+        crossSections.append(copy.deepcopy(crossSections[-1]))
+        crossSections[-1].translation.y += 10
+        focussection = len(crossSections) - 1
+        focussectionpoint = 0
+        updateCrossSections()
+        #glutPostRedisplay()
+    if key == b'p':
+        focussectionpoint += 1
+    if key == b'q':
+        focussection -= 1
+    if key == b'e':
+        focussection += 1
     project()
 
 def windowMenu(value):
@@ -304,7 +277,7 @@ def main():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-    parse()
+    init()
 
     glutMainLoop()
     return 0
