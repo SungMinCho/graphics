@@ -20,11 +20,11 @@ asp = windowWidth / windowHeight
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 class CrossSection:
-    def __init__(self):
-        self.controlPoints = []
-        self.scale = 1
-        self.rotation = None
-        self.translation = (0, 0, 0)
+    def __init__(self, controlPoints, scale, rotation, translation):
+        self.controlPoints = controlPoints
+        self.scale = scale
+        self.rotation = rotation
+        self.translation = translation
 
 isBspline = True
 crossSections = [] # (list of CrossSection)
@@ -83,18 +83,15 @@ def parse():
             axisx = float(words.__next__())
             axisy = float(words.__next__())
             axisz = float(words.__next__())
-            rotation = (angle, axisx, axisy, axisz)
+            axis = Vector(axisx, axisy, axisz)
+            rotation = Quaternion.fromAxisAngle(axis, angle)
 
             positionx = float(words.__next__())
             positiony = float(words.__next__())
             positionz = float(words.__next__())
             translation = (positionx, positiony, positionz)
 
-            crossSection = CrossSection()
-            crossSection.controlPoints = points
-            crossSection.scale = scale
-            crossSection.rotation = rotation
-            crossSection.translation = translation
+            crossSection = CrossSection(points, scale, rotation, translation)
 
             crossSections.append(crossSection)
 
@@ -102,7 +99,7 @@ def parse():
 def closedCurve(c): # c is of type CrossSection
     glPushMatrix()
     glScalef(c.scale, c.scale, c.scale)
-    glRotatef(c.rotation[0], c.rotation[1], c.rotation[2], c.rotation[3])
+    glMultMatrixf(Quaternion.makeRotationMatrix(c.rotation))
     glTranslatef(c.translation[0], c.translation[1], c.translation[2])
 
     # control lines. for comparison with the actual curve
@@ -156,6 +153,9 @@ def closedCurve(c): # c is of type CrossSection
 
     glPopMatrix()
 
+def crossSectionCatmullRom(c1, c2, c3, c4):
+    return []
+
 def project():
     camera.lookat()
 
@@ -169,6 +169,11 @@ def display():
     # draw the thing
     for c in crossSections:
         closedCurve(c)
+
+    l = len(crossSections)
+    for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
+        for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
+            closedCurve(c)
     
     glFlush()
     glutSwapBuffers()
