@@ -98,9 +98,9 @@ def parse():
 
 def closedCurve(c): # c is of type CrossSection
     glPushMatrix()
-    glScalef(c.scale, c.scale, c.scale)
-    glMultMatrixf(Quaternion.makeRotationMatrix(c.rotation))
     glTranslatef(c.translation[0], c.translation[1], c.translation[2])
+    glMultMatrixf(Quaternion.makeRotationMatrix(c.rotation))
+    glScalef(c.scale, c.scale, c.scale)
 
     # control lines. for comparison with the actual curve
     for i in range(len(c.controlPoints)):
@@ -128,7 +128,7 @@ def closedCurve(c): # c is of type CrossSection
         p4 = c.controlPoints[(i+3) % len(c.controlPoints)]
 
         glBegin(GL_LINE_STRIP)
-        T = 10
+        T = 10 # determines the number of knots
         for uI in range(0, T+1):
             u = uI / T
             u2 = u*u
@@ -154,7 +154,60 @@ def closedCurve(c): # c is of type CrossSection
     glPopMatrix()
 
 def crossSectionCatmullRom(c1, c2, c3, c4):
-    return []
+    T = 5 # determines the number of knots
+    for uI in range(0, T+1):
+        u = uI / T
+        u2 = u*u
+        u3 = u2*u
+
+        f1 = -u3/2 + u2 - u/2
+        f2 = u3*1.5 - u2*2.5 + 1
+        f3 = -u3*1.5 + u2*2 + u/2
+        f4 = u3/2 - u2/2
+
+        # points
+        ps1 = c1.controlPoints
+        ps2 = c2.controlPoints
+        ps3 = c3.controlPoints
+        ps4 = c4.controlPoints
+
+        if not (len(ps1) == len(ps2) and len(ps2) == len(ps3) and len(ps3) == len(ps4)):
+            print('len', len(ps1), len(ps2), len(ps3), len(ps4))
+            exit()
+
+        ps = []
+        for (p1, p2, p3, p4) in zip(ps1, ps2, ps3, ps4):
+            (x1, z1) = p1
+            (x2, z2) = p1
+            (x3, z3) = p1
+            (x4, z4) = p1
+
+            x = f1*x1 + f2*x2 + f3*x3 + f4*x4
+            z = f1*z1 + f2*z2 + f3*z3 + f4*z4
+
+            ps.append((x, z))
+
+        # scale
+        scale = f1*c1.scale + f2*c2.scale + f3*c3.scale + f4*c4.scale
+
+        # rotation
+        # TODO
+        rotation = c1.rotation
+
+
+        # translation
+        (x1, y1, z1) = c1.translation
+        (x2, y2, z2) = c2.translation
+        (x3, y3, z3) = c3.translation
+        (x4, y4, z4) = c4.translation
+
+        x = f1*x1 + f2*x2 + f3*x3 + f4*x4
+        y = f1*y1 + f2*y2 + f3*y3 + f4*y4
+        z = f1*z1 + f2*z2 + f3*z3 + f4*z4
+
+        translation = (x, y, z)
+
+        yield CrossSection(ps, scale, rotation, translation)
 
 def project():
     camera.lookat()
@@ -167,8 +220,8 @@ def display():
     camera.lookat()
 
     # draw the thing
-    for c in crossSections:
-        closedCurve(c)
+    #for c in crossSections:
+    #    closedCurve(c)
 
     l = len(crossSections)
     for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
