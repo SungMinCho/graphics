@@ -19,8 +19,15 @@ asp = windowWidth / windowHeight
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
+class CrossSection:
+    def __init__(self):
+        self.controlPoints = []
+        self.scale = 1
+        self.rotation = None
+        self.translation = (0, 0, 0)
+
 isBspline = True
-crossSections = [] # (list of (points, scale, rotation, translation))
+crossSections = [] # (list of CrossSection)
 crossSectionsNum = 0
 controlPointsNum = 0
 
@@ -83,12 +90,36 @@ def parse():
             positionz = float(words.__next__())
             translation = (positionx, positiony, positionz)
 
-            crossSections.append((points, scale, rotation, translation))
+            crossSection = CrossSection()
+            crossSection.controlPoints = points
+            crossSection.scale = scale
+            crossSection.rotation = rotation
+            crossSection.translation = translation
+
+            crossSections.append(crossSection)
 
 
-def closedCurve(points, scale, rotation, translation):
+def closedCurve(c): # c is of type CrossSection
     if isBspline:
-        pass
+        glPushMatrix()
+        glScalef(c.scale, c.scale, c.scale)
+        glRotatef(c.rotation[0], c.rotation[1], c.rotation[2], c.rotation[3])
+        glTranslatef(c.translation[0], c.translation[1], c.translation[2])
+        for i in range(len(c.controlPoints)):
+            glBegin(GL_LINE_STRIP)
+            p = c.controlPoints[i]
+            q = c.controlPoints[(i+1) % len(c.controlPoints)]
+            glVertex3f(p[0], 0, p[1])
+            glVertex3f(q[0], 0, q[1])
+            glEnd()
+
+        for point in c.controlPoints:
+            glBegin(GL_POINTS)
+            glColor3f(0, 1, 0)
+            #glPointSize(100)
+            glVertex3f(point[0], 0, point[1])
+            glEnd()
+        glPopMatrix()
     else:
         pass
 
@@ -103,6 +134,8 @@ def display():
     camera.lookat()
 
     # draw the thing
+    for c in crossSections:
+        closedCurve(c)
     
     glFlush()
     glutSwapBuffers()
@@ -147,8 +180,6 @@ def mouseEvent(button, state, x, y):
 
 def main():
     parse()
-    print(crossSections)
-    return
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(windowWidth, windowHeight)

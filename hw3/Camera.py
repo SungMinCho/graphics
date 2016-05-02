@@ -7,7 +7,7 @@ from math import *
 class Camera:
 	# eye = focus + (0, 0, dim) * orientation
 	def __init__(self, orientation, width, height):
-		self.dim = 180.0
+		self.dim = 40
 		self.fov = 55
 		self.asp = width / height
 		self.orientation = orientation
