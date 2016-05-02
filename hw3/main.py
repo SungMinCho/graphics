@@ -28,6 +28,13 @@ catmullCrossSections = []
 focussection = 0
 focussectionpoint = 0
 
+CPS = [
+        [(0,0), (10, 0), (10, 10), (0, 10)],
+        [(0,0), (10, 0), (10, 50), (0, 50)]
+      ]
+
+CPSidx = 0
+
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 class CrossSection:
@@ -47,7 +54,21 @@ class CrossSection:
 
         self.orientation = Quaternion.fromAxisAngle(axis, angle)
 
+        self.updateAxisAngle()
         self.update()
+
+    def updateAxisAngle(self):
+        #print('axis', self.axis.x, self.axis.y, self.axis.z, 'angle', self.angle)
+        self.angle = 2*acos(self.orientation.w)
+        if self.angle == 0:
+            self.axis = Vector(1, 0, 0)
+        elif self.angle == 180:
+            self.axis = Vector(self.orientation.x, self.orientation.y, self.orientation.z)
+        else:
+            self.axis = Vector(self.orientation.x / sqrt(1-self.orientation.w**2),
+                               self.orientation.y / sqrt(1-self.orientation.w**2),
+                               self.orientation.z / sqrt(1-self.orientation.w**2))
+        #print('axis', self.axis.x, self.axis.y, self.axis.z, 'angle', self.angle)
 
     def update(self):
         # calculate points on curve with the matrix multiplied
@@ -84,7 +105,8 @@ class CrossSection:
         glLoadIdentity()
         glPushMatrix()
         glTranslatef(self.translation.x, self.translation.y, self.translation.z)
-        glRotatef(self.angle, self.axis.x, self.axis.y, self.axis.z)
+        #glRotatef(self.angle, self.axis.x, self.axis.y, self.axis.z)
+        glMultMatrixf(self.orientation.makeRotationMatrix())
         glScalef(self.scale, self.scale, self.scale)
         m = glGetDoublev(GL_MODELVIEW_MATRIX)
         glPopMatrix()
@@ -163,7 +185,7 @@ def updateCrossSections():
     global catmullCrossSections
 
     cs = copy.deepcopy(crossSections)
-    cs = [cs[0]] + cs + [cs[-1]]
+    cs = [cs[0], cs[0], cs[0]] + cs + [cs[-1], cs[-1], cs[-1]]
 
     catmullCrossSections = []
     l = len(cs)
@@ -173,7 +195,7 @@ def updateCrossSections():
 
 def init():
     global crossSections
-    first = CrossSection([(0,0),(10,0),(10,10),(0,10)], 1, 0, Vector(1, 0, 0), Vector(0, 0, 0))
+    first = CrossSection(CPS[0], 1, -180, Vector(1, 0, 0), Vector(-50, 50, -50))
     crossSections.append(first)
 
 def drawMesh(c1, c2): # c1, c2 is CrossSection
@@ -244,20 +266,23 @@ def windowKey(key, x, y):
     if key == b'c':
         crossSections.append(copy.deepcopy(crossSections[-1]))
         last = crossSections[-1]
-        v = last.orientation.rotateVector(Vector(0, 1, 0))
+        v = last.orientation.rotateVector(Vector(0, 2, 0))
         last.translation = last.translation + v
         focussection = len(crossSections) - 1
         focussectionpoint = 0
         crossSections[-1].update()
         updateCrossSections()
         #glutPostRedisplay()
-    if key == b'p':
+    if key == b'1':
+        focussectionpoint -= 1
+    if key == b'3':
         focussectionpoint += 1
     if key == b'q':
         focussection -= 1
     if key == b'e':
         focussection += 1
     if key == b'w':
+        print('w')
         c = crossSections[focussection]
         v = c.orientation.rotateVector(Vector(0, 1, 0))
         c.translation = c.translation + v
@@ -293,6 +318,102 @@ def windowKey(key, x, y):
         c.translation = c.translation + v
         c.update()
         updateCrossSections()
+    if key == b'W':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(1, 0, 0))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b'S':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(-1, 0, 0))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b'A':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(0, 0, 1))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b'D':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(0, 0, -1))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b'Z':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(0, 1, 0))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b'X':
+        c = crossSections[focussection]
+        axis = c.orientation.rotateVector(Vector(0, -1, 0))
+        q = Quaternion.fromAxisAngle(axis, -0.1)
+        c.orientation = q * c.orientation
+        c.updateAxisAngle()
+        c.update()
+        updateCrossSections()
+    if key == b't':
+        c = crossSections[focussection]
+        idx = focussectionpoint % len(c.controlPoints)
+        c.controlPoints[idx] = (c.controlPoints[idx][0], c.controlPoints[idx][1] + 1)
+        c.update()
+        updateCrossSections()
+    if key == b'g':
+        c = crossSections[focussection]
+        idx = focussectionpoint % len(c.controlPoints)
+        c.controlPoints[idx] = (c.controlPoints[idx][0], c.controlPoints[idx][1] - 1)
+        c.update()
+        updateCrossSections()
+    if key == b'f':
+        c = crossSections[focussection]
+        idx = focussectionpoint % len(c.controlPoints)
+        c.controlPoints[idx] = (c.controlPoints[idx][0] - 1, c.controlPoints[idx][1])
+        c.update()
+        updateCrossSections()
+    if key == b'h':
+        c = crossSections[focussection]
+        idx = focussectionpoint % len(c.controlPoints)
+        c.controlPoints[idx] = (c.controlPoints[idx][0] + 1, c.controlPoints[idx][1])
+        c.update()
+        updateCrossSections()
+
+    if key == b'2':
+        global CPSidx
+        CPSidx = (CPSidx + 1) % len(CPS)
+        crossSections[focussection].controlPoints = CPS[CPSidx]
+        crossSections[focussection].update()
+        updateCrossSections()
+
+    if key == b'`': # save
+        with open("save", "w") as f:
+            f.write('BSPLINE\n' + str(len(crossSections)) + '\n4\n')
+            for c in crossSections:
+                for p in c.controlPoints:
+                    f.write(str(p[0]))
+                    f.write(' ')
+                    f.write(str(p[1]))
+                    f.write('\n')
+                f.write(str(c.scale))
+                f.write('\n')
+                f.write(' '.join([str(c.angle), str(c.axis.x), str(c.axis.y), str(c.axis.z)]))
+                f.write('\n')
+                f.write(' '.join([str(c.translation.x), str(c.translation.y), str(c.translation.z)]))
+                f.write('\n')
+                f.write('\n')
 
     glutPostRedisplay()
     project()
