@@ -19,6 +19,79 @@ asp = windowWidth / windowHeight
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
+isBspline = True
+crossSections = [] # (list of (points, scale, rotation, translation))
+crossSectionsNum = 0
+controlPointsNum = 0
+
+def linesToStreamDisregardingComments(lines):
+    for line in lines:
+        sharpPos = line.find('#')
+        if sharpPos >= 0:
+            line = line[:sharpPos]
+            line = ''.join(line)
+
+        line = line.split()
+        for word in line:
+            if(word.startswith('#')):
+                break
+            if(word == ''):
+                continue
+            yield word
+
+def parse():
+    if(len(sys.argv) <= 1):
+        print("usage : python3 main.py [inputfile path]")
+        exit()
+
+    filename = sys.argv[1]
+    with open(filename, 'r') as f:
+        words = linesToStreamDisregardingComments(f.readlines())
+
+        global isBspline
+        spline = words.__next__()
+        if spline == "BSPLINE":
+            isBspline = True
+        elif spline == "CATMULL_ROM":
+            isBspline = False
+        else:
+            print("spline should be either 'BSPLINE' or 'CATMULL_ROM'")
+            exit()
+
+        global crossSectionsNum
+        global controlPointsNum
+        crossSectionsNum = int(words.__next__())
+        controlPointsNum = int(words.__next__())
+
+        global crossSections
+        for i in range(crossSectionsNum):
+            points = []
+            for j in range(controlPointsNum):
+                x = float(words.__next__())
+                y = float(words.__next__())
+                points.append((x, y))
+            scale = float(words.__next__())
+
+            angle = float(words.__next__())
+            axisx = float(words.__next__())
+            axisy = float(words.__next__())
+            axisz = float(words.__next__())
+            rotation = (angle, axisx, axisy, axisz)
+
+            positionx = float(words.__next__())
+            positiony = float(words.__next__())
+            positionz = float(words.__next__())
+            translation = (positionx, positiony, positionz)
+
+            crossSections.append((points, scale, rotation, translation))
+
+
+def closedCurve(points, scale, rotation, translation):
+    if isBspline:
+        pass
+    else:
+        pass
+
 def project():
     camera.lookat()
 
@@ -73,6 +146,9 @@ def mouseEvent(button, state, x, y):
             camera.mouseLeft = False
 
 def main():
+    parse()
+    print(crossSections)
+    return
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(windowWidth, windowHeight)
