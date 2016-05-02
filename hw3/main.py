@@ -202,7 +202,7 @@ def parse():
         first = crossSections[0]
         last = crossSections[-1]
 
-        crossSections = [first] + crossSections + [last]
+        crossSections = [first, first, first] + crossSections + [last, last, last]
 
         global catmullCrossSections
         l = len(crossSections)
