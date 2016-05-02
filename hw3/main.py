@@ -17,9 +17,23 @@ fovTarget = 55
 dimTarget = 90.0
 asp = windowWidth / windowHeight
 
+isBspline = True
+crossSections = [] # (list of CrossSection)
+crossSectionsNum = 0
+controlPointsNum = 0
+
+catmullCrossSections = []
+
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 class CrossSection:
+    def mat_point(m, p):
+        x = m[0][0]*p[0] + m[1][0]*p[1] + m[2][0]*p[2] + m[3][0]*p[3]
+        y = m[0][1]*p[0] + m[1][1]*p[1] + m[2][1]*p[2] + m[3][1]*p[3]
+        z = m[0][2]*p[0] + m[1][2]*p[1] + m[2][2]*p[2] + m[3][2]*p[3]
+        w = m[0][3]*p[0] + m[1][3]*p[1] + m[2][3]*p[2] + m[3][3]*p[3]
+        return (x, y, z, w)
+
     def __init__(self, controlPoints, scale, angle, axis, translation):
         self.controlPoints = controlPoints
         self.scale = scale
@@ -27,131 +41,45 @@ class CrossSection:
         self.axis = axis
         self.translation = translation
 
-isBspline = True
-crossSections = [] # (list of CrossSection)
-crossSectionsNum = 0
-controlPointsNum = 0
+        # calculate points on curve with the matrix multiplied
+        realPoints = []
+        for i in range(len(controlPoints)):
+            p1 = controlPoints[i]
+            p2 = controlPoints[(i+1) % len(controlPoints)]
+            p3 = controlPoints[(i+2) % len(controlPoints)]
+            p4 = controlPoints[(i+3) % len(controlPoints)]
 
-def linesToStreamDisregardingComments(lines):
-    for line in lines:
-        sharpPos = line.find('#')
-        if sharpPos >= 0:
-            line = line[:sharpPos]
-            line = ''.join(line)
+            T = 5 # determines the number of knots
+            for uI in range(0, T+1):
+                u = uI / T
+                u2 = u * u
+                u3 = u2 * u
 
-        line = line.split()
-        for word in line:
-            if(word.startswith('#')):
-                break
-            if(word == ''):
-                continue
-            yield word
+                if isBspline:
+                    f1 = -u3/6 + u2/2 - u/2 + 1/6
+                    f2 = u3/2 - u2 + 2/3
+                    f3 = -u3/2 + u2/2 + u/2 + 1/6
+                    f4 = u3/6
+                else:
+                    f1 = -u3/2 + u2 - u/2
+                    f2 = u3*1.5 - u2*2.5 + 1
+                    f3 = -u3*1.5 + u2*2 + u/2
+                    f4 = u3/2 - u2/2
 
-def parse():
-    if(len(sys.argv) <= 1):
-        print("usage : python3 main.py [inputfile path]")
-        exit()
+                x = f1*p1[0] + f2*p2[0] + f3*p3[0] + f4*p4[0]
+                z = f1*p1[1] + f2*p2[1] + f3*p3[1] + f4*p4[1]
 
-    filename = sys.argv[1]
-    with open(filename, 'r') as f:
-        words = linesToStreamDisregardingComments(f.readlines())
+                realPoints.append((x, z))
 
-        global isBspline
-        spline = words.__next__()
-        if spline == "BSPLINE":
-            isBspline = True
-        elif spline == "CATMULL_ROM":
-            isBspline = False
-        else:
-            print("spline should be either 'BSPLINE' or 'CATMULL_ROM'")
-            exit()
+        glPushMatrix()
+        glTranslatef(translation.x, translation.y, translation.z)
+        glRotatef(angle, axis.x, axis.y, axis.z)
+        glScalef(scale, scale, scale)
+        m = glGetDoublev(GL_MODELVIEW_MATRIX)
+        glPopMatrix()
 
-        global crossSectionsNum
-        global controlPointsNum
-        crossSectionsNum = int(words.__next__())
-        controlPointsNum = int(words.__next__())
+        self.realPoints = [CrossSection.mat_point(m, (p[0], 0, p[1], 1)) for p in realPoints]
 
-        global crossSections
-        for i in range(crossSectionsNum):
-            points = []
-            for j in range(controlPointsNum):
-                x = float(words.__next__())
-                y = float(words.__next__())
-                points.append((x, y))
-            scale = float(words.__next__())
-
-            angle = float(words.__next__())
-            axisx = float(words.__next__())
-            axisy = float(words.__next__())
-            axisz = float(words.__next__())
-            axis = Vector(axisx, axisy, axisz)
-
-            positionx = float(words.__next__())
-            positiony = float(words.__next__())
-            positionz = float(words.__next__())
-            translation = Vector(positionx, positiony, positionz)
-
-            crossSection = CrossSection(points, scale, angle, axis, translation)
-
-            crossSections.append(crossSection)
-
-
-def closedCurve(c): # c is of type CrossSection
-    glPushMatrix()
-    glTranslatef(c.translation.x, c.translation.y, c.translation.z)
-    glRotatef(c.angle, c.axis.x, c.axis.y, c.axis.z)
-    glScalef(c.scale, c.scale, c.scale)
-
-    # control lines. for comparison with the actual curve
-    #for i in range(len(c.controlPoints)):
-    #    glBegin(GL_LINE_STRIP)
-    #    glColor3f(1, 1, 1)
-    #    p = c.controlPoints[i]
-    #    q = c.controlPoints[(i+1) % len(c.controlPoints)]
-    #    glVertex3f(p[0], 0, p[1])
-    #    glVertex3f(q[0], 0, q[1])
-    #    glEnd()
-
-    """for point in c.controlPoints:
-        glBegin(GL_POINTS)
-        glColor3f(0, 1, 0)
-        #glPointSize(100)
-        glVertex3f(point[0], 0, point[1])
-        glEnd()"""
-
-    glColor3f(0, 1, 0)
-
-    for i in range(len(c.controlPoints)):
-        p1 = c.controlPoints[i]
-        p2 = c.controlPoints[(i+1) % len(c.controlPoints)]
-        p3 = c.controlPoints[(i+2) % len(c.controlPoints)]
-        p4 = c.controlPoints[(i+3) % len(c.controlPoints)]
-
-        glBegin(GL_LINE_STRIP)
-        T = 5 # determines the number of knots
-        for uI in range(0, T+1):
-            u = uI / T
-            u2 = u*u
-            u3 = u2*u
-
-            if isBspline:
-                f1 = -u3/6 + u2/2 - u/2 + 1/6
-                f2 = u3/2 - u2 + 2/3
-                f3 = -u3/2 + u2/2 + u/2 + 1/6
-                f4 = u3/6
-            else:
-                f1 = -u3/2 + u2 - u/2
-                f2 = u3*1.5 - u2*2.5 + 1
-                f3 = -u3*1.5 + u2*2 + u/2
-                f4 = u3/2 - u2/2
-
-            x = f1*p1[0] + f2*p2[0] + f3*p3[0] + f4*p4[0]
-            z = f1*p1[1] + f2*p2[1] + f3*p3[1] + f4*p4[1]
-            glVertex3f(x, 0, z)
-        glEnd()
-
-
-    glPopMatrix()
 
 def crossSectionCatmullRom(c1, c2, c3, c4):
     T = 5 # determines the number of knots
@@ -205,6 +133,84 @@ def crossSectionCatmullRom(c1, c2, c3, c4):
 
         yield CrossSection(ps, scale, angle, axis, translation)
 
+def linesToStreamDisregardingComments(lines):
+    for line in lines:
+        sharpPos = line.find('#')
+        if sharpPos >= 0:
+            line = line[:sharpPos]
+            line = ''.join(line)
+
+        line = line.split()
+        for word in line:
+            if(word.startswith('#')):
+                break
+            if(word == ''):
+                continue
+            yield word
+
+def parse():
+    if(len(sys.argv) <= 1):
+        print("usage : python3 main.py [inputfile path]")
+        exit()
+
+    filename = sys.argv[1]
+    with open(filename, 'r') as f:
+        words = linesToStreamDisregardingComments(f.readlines())
+
+        global isBspline
+        spline = words.__next__()
+        if spline == "BSPLINE":
+            isBspline = True
+        elif spline == "CATMULL_ROM":
+            isBspline = False
+        else:
+            print("spline should be either 'BSPLINE' or 'CATMULL_ROM'")
+            exit()
+
+        global crossSectionsNum
+        global controlPointsNum
+        crossSectionsNum = int(words.__next__())
+        controlPointsNum = int(words.__next__())
+
+        global crossSections
+        for i in range(crossSectionsNum):
+            points = []
+            for j in range(controlPointsNum):
+                x = float(words.__next__())
+                z = float(words.__next__())
+                points.append((x, z))
+            scale = float(words.__next__())
+
+            angle = float(words.__next__())
+            axisx = float(words.__next__())
+            axisy = float(words.__next__())
+            axisz = float(words.__next__())
+            axis = Vector(axisx, axisy, axisz)
+
+            positionx = float(words.__next__())
+            positiony = float(words.__next__())
+            positionz = float(words.__next__())
+            translation = Vector(positionx, positiony, positionz)
+
+            crossSection = CrossSection(points, scale, angle, axis, translation)
+
+            crossSections.append(crossSection)
+
+        global catmullCrossSections
+        l = len(crossSections)
+        for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
+            prev = None
+            for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
+                catmullCrossSections.append(c)
+ 
+def drawMesh(c1, c2): # c1, c2 is CrossSection
+    glBegin(GL_TRIANGLE_STRIP)
+    for (p1, p2) in list(zip(c1.realPoints, c2.realPoints)) + [(c1.realPoints[0], c2.realPoints[0])]:
+        glVertex3f(p1[0], p1[1], p1[2])
+        glVertex3f(p2[0], p2[1], p2[2])
+    glEnd()
+
+
 def project():
     camera.lookat()
 
@@ -219,11 +225,17 @@ def display():
     #for c in crossSections:
     #    closedCurve(c)
 
-    l = len(crossSections)
-    for i in range(0, l-3): # (0,1,2,3) to (l-4,l-3,l-2,l-1)
-        for c in crossSectionCatmullRom(crossSections[i], crossSections[i+1], crossSections[i+2], crossSections[i+3]):
-            closedCurve(c)
-    
+
+    glColor3f(0, 1, 0)
+    prev = None
+    for c in catmullCrossSections:
+        if prev == None:
+            prev = c
+            continue
+        drawMesh(prev, c)
+        prev = c
+
+
     glFlush()
     glutSwapBuffers()
 
@@ -266,7 +278,6 @@ def mouseEvent(button, state, x, y):
             camera.mouseLeft = False
 
 def main():
-    parse()
     glutInit(sys.argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH)
     glutInitWindowSize(windowWidth, windowHeight)
@@ -281,6 +292,8 @@ def main():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
+
+    parse()
 
     glutMainLoop()
     return 0
