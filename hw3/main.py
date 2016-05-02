@@ -71,6 +71,8 @@ class CrossSection:
 
                 realPoints.append((x, z))
 
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
         glPushMatrix()
         glTranslatef(translation.x, translation.y, translation.z)
         glRotatef(angle, axis.x, axis.y, axis.z)
