@@ -6,6 +6,7 @@ from OpenGL.GLUT import *
 from quaternion import *
 from Camera import *
 
+
 windowName = b"window"
 windowWidth = 1000
 windowHeight = 600
