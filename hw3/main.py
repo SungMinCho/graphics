@@ -28,9 +28,11 @@ catmullCrossSections = []
 focussection = 0
 focussectionpoint = 0
 
+CPNUM = 8
 CPS = [
-        [(0,0), (10, 0), (10, 10), (0, 10)],
-        [(0,0), (10, 0), (10, 50), (0, 50)]
+        [(5,0), (4, 4), (0, 5), (-4, 4), (-5, 0), (-4, -4), (0, -5), (4, -4)],
+        [(5,0), (0, 0), (0, 5), (0, 0), (-5, 0), (0, 0), (0, -5), (0, 0)],
+        [(5,0), (4, 4), (0, 5), (-4, 4), (-5, 0), (-4, -4), (0, -5), (4, -4)]
       ]
 
 CPSidx = 0
@@ -195,7 +197,7 @@ def updateCrossSections():
 
 def init():
     global crossSections
-    first = CrossSection(CPS[0], 1, -180, Vector(1, 0, 0), Vector(-50, 50, -50))
+    first = CrossSection(CPS[0], 0, 45, Vector(0, 1, 0), Vector(0, -40, 0))
     crossSections.append(first)
 
 def drawMesh(c1, c2): # c1, c2 is CrossSection
@@ -282,7 +284,6 @@ def windowKey(key, x, y):
     if key == b'e':
         focussection += 1
     if key == b'w':
-        print('w')
         c = crossSections[focussection]
         v = c.orientation.rotateVector(Vector(0, 1, 0))
         c.translation = c.translation + v
@@ -398,9 +399,18 @@ def windowKey(key, x, y):
         crossSections[focussection].update()
         updateCrossSections()
 
+    if key == b'4':
+        crossSections[focussection].scale -= 0.1
+        crossSections[focussection].update()
+        updateCrossSections()
+    if key == b'5':
+        crossSections[focussection].scale += 0.1
+        crossSections[focussection].update()
+        updateCrossSections()
+
     if key == b'`': # save
         with open("save", "w") as f:
-            f.write('BSPLINE\n' + str(len(crossSections)) + '\n4\n')
+            f.write('BSPLINE\n' + str(len(crossSections)) + '\n' + str(CPNUM) + '\n')
             for c in crossSections:
                 for p in c.controlPoints:
                     f.write(str(p[0]))
