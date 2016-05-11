@@ -22,7 +22,7 @@ class Vector:
         return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 
     def cross(a, b):
-        return Vector(a.y*b.z - a.z*b.y, a.x*b.z - a.z*b.x, a.x*b.y - a.y*b.x)
+        return Vector(a.y*b.z - a.z*b.y, a.z*b.x - a.x*b.z, a.x*b.y - a.y*b.x)
 
     def length(self):
         return sqrt(Vector.dot(self, self))

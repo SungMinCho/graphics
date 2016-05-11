@@ -218,6 +218,43 @@ def drawMesh(c1, c2): # c1, c2 is CrossSection
         glVertex3f(p2[0], p2[1], p2[2])
     glEnd()
 
+def pointToStlString(p):
+    return str(p[0]) + " " + str(p[1]) + " " + str(p[2])
+
+def writeMesh(f, c1, c2):
+    buffer = [c1.realPoints[0], c2.realPoints[0], None]
+    P1 = None
+    P2 = c1.realPoints[0]
+    P3 = c2.realPoints[0]
+    index = 2
+    for (p1, p2) in list(zip(c1.realPoints[1:], c2.realPoints[1:])) + [(c1.realPoints[0], c2.realPoints[0])]:
+        (P1, P2, P3) = (P2, P3, p1)
+        V = Vector(P2[0]-P1[0],P2[1]-P1[1],P2[2]-P1[2])
+        W = Vector(P3[0]-P1[0],P3[1]-P1[1],P3[2]-P1[2])
+        N = Vector.cross(V, W)
+        N = (N.x, N.y, N.z)
+        # write
+        f.write("facet normal " + pointToStlString(N) + "\n")
+        f.write("    outer loop\n")
+        f.write("        vertex " + pointToStlString(P1) + '\n')
+        f.write("        vertex " + pointToStlString(P2) + '\n')
+        f.write("        vertex " + pointToStlString(P3) + '\n')
+        f.write("    endloop\n")
+        f.write("endfacet\n")
+
+        (P1, P2, P3) = (P2, P3, p2)
+        V = Vector(P2[0]-P1[0],P2[1]-P1[1],P2[2]-P1[2])
+        W = Vector(P3[0]-P1[0],P3[1]-P1[1],P3[2]-P1[2])
+        N = Vector.cross(V, W)
+        N = (N.x, N.y, N.z)
+        # write
+        f.write("facet normal " + pointToStlString(N) + "\n")
+        f.write("    outer loop\n")
+        f.write("        vertex " + pointToStlString(P1) + '\n')
+        f.write("        vertex " + pointToStlString(P2) + '\n')
+        f.write("        vertex " + pointToStlString(P3) + '\n')
+        f.write("    endloop\n")
+        f.write("endfacet\n")
 
 def project():
     camera.lookat()
@@ -252,6 +289,18 @@ def display():
 
     glFlush()
     glutSwapBuffers()
+
+def write_stl_file():
+    with open("output.stl", "w") as f:
+        f.write("solid \n")
+        prev = None
+        for c in catmullCrossSections:
+            if prev == None:
+                prev = c
+                continue
+            writeMesh(f, prev, c)
+            prev = c
+        f.write("endsolid \n")
 
 def animate(value):
     glutPostRedisplay()
@@ -308,6 +357,7 @@ def main():
     glLoadIdentity()
 
     parse()
+    write_stl_file()
 
     glutMainLoop()
     return 0
