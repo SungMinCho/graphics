@@ -222,37 +222,36 @@ def pointToStlString(p):
     return str(p[0]) + " " + str(p[1]) + " " + str(p[2])
 
 def writeMesh(f, c1, c2):
-    buffer = [c1.realPoints[0], c2.realPoints[0], None]
-    P1 = None
-    P2 = c1.realPoints[0]
-    P3 = c2.realPoints[0]
+    T1 = None
+    T2 = c1.realPoints[0]
+    T3 = c2.realPoints[0]
     index = 2
     for (p1, p2) in list(zip(c1.realPoints[1:], c2.realPoints[1:])) + [(c1.realPoints[0], c2.realPoints[0])]:
-        (P1, P2, P3) = (P2, P3, p1)
-        V = Vector(P2[0]-P1[0],P2[1]-P1[1],P2[2]-P1[2])
-        W = Vector(P3[0]-P1[0],P3[1]-P1[1],P3[2]-P1[2])
+        (T1, T2, T3) = (T2, T3, p1)
+        V = Vector(T2[0]-T1[0],T2[1]-T1[1],T2[2]-T1[2])
+        W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
         N = Vector.cross(V, W)
-        N = (N.x, N.y, N.z)
+        N = (-N.x, -N.y, -N.z)
         # write
         f.write("facet normal " + pointToStlString(N) + "\n")
         f.write("    outer loop\n")
-        f.write("        vertex " + pointToStlString(P1) + '\n')
-        f.write("        vertex " + pointToStlString(P2) + '\n')
-        f.write("        vertex " + pointToStlString(P3) + '\n')
+        f.write("        vertex " + pointToStlString(T1) + '\n')
+        f.write("        vertex " + pointToStlString(T2) + '\n')
+        f.write("        vertex " + pointToStlString(T3) + '\n')
         f.write("    endloop\n")
         f.write("endfacet\n")
 
-        (P1, P2, P3) = (P2, P3, p2)
-        V = Vector(P2[0]-P1[0],P2[1]-P1[1],P2[2]-P1[2])
-        W = Vector(P3[0]-P1[0],P3[1]-P1[1],P3[2]-P1[2])
+        (T1, T2, T3) = (T2, T3, p2)
+        V = Vector(T2[0]-T1[0],T2[1]-T1[1],T2[2]-T1[2])
+        W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
         N = Vector.cross(V, W)
         N = (N.x, N.y, N.z)
         # write
         f.write("facet normal " + pointToStlString(N) + "\n")
         f.write("    outer loop\n")
-        f.write("        vertex " + pointToStlString(P1) + '\n')
-        f.write("        vertex " + pointToStlString(P2) + '\n')
-        f.write("        vertex " + pointToStlString(P3) + '\n')
+        f.write("        vertex " + pointToStlString(T1) + '\n')
+        f.write("        vertex " + pointToStlString(T3) + '\n')
+        f.write("        vertex " + pointToStlString(T2) + '\n')
         f.write("    endloop\n")
         f.write("endfacet\n")
 
