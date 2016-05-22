@@ -245,7 +245,7 @@ def appendNormals(c1, c2):
         W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
         #N = Vector.cross(V, W)
         #N = (-N.x, -N.y, -N.z)
-        N = Vector.cross(W, V)
+        N = Vector.cross(V, W)
 
         for p in (T1,T2,T3):
             if p not in vertexNormals:
@@ -255,7 +255,7 @@ def appendNormals(c1, c2):
         (T1, T2, T3) = (T2, T3, p2)
         V = Vector(T2[0]-T1[0],T2[1]-T1[1],T2[2]-T1[2])
         W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
-        N = Vector.cross(V, W)
+        N = Vector.cross(W, V)
         #N = (N.x, N.y, N.z)
 
         for p in (T1,T2,T3):
@@ -278,6 +278,9 @@ def display():
     #    closedCurve(c)
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+
+    glColor4f(1, 1, 1, 0)
+    glutSolidSphere(15, 20, 20)
 
     l = len(catmullCrossSections)
     l = 1 / l
@@ -384,10 +387,10 @@ def main():
 
     mat_specular = [ 1.0, 1.0, 1.0, 1.0 ]
     mat_shininess = [ 50.0 ]
-    light_position = [ -500.0, 0.0, 0.0, -1.0 ]
-    light_position1 = [ 500.0, 500.0, 0.0, -1.0 ]
-    light_position2 = [ 500.0, -500.0, 0.0, -1.0 ]
-    light_position3 = [ -500.0, -500.0, 500.0, -1.0 ]
+    light_position = [ 0.0, 500.0, 100.0, 1.0 ]
+    light_position1 = [ 500.0, 500.0, 0.0, 1.0 ]
+    light_position2 = [ 500.0, -500.0, 0.0, 1.0 ]
+    light_position3 = [ -500.0, -500.0, 0.0, 1.0 ]
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glShadeModel(GL_SMOOTH);
 
@@ -397,7 +400,7 @@ def main():
     glLightfv(GL_LIGHT0, GL_DIFFUSE, [1.0,1.0,1.0,0.0])
     glLightfv(GL_LIGHT0, GL_POSITION, light_position)
 
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, [1.0,0.0,0.2,1.0])
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, [1.0,0.0,0.0,1.0])
     glLightfv(GL_LIGHT1, GL_POSITION, light_position1)
 
     glLightfv(GL_LIGHT2, GL_DIFFUSE, [0.0,0.0,1.0,1.0])
