@@ -356,7 +356,7 @@ def main():
     glLoadIdentity()
 
     parse()
-    write_stl_file()
+    #write_stl_file()
 
     glutMainLoop()
     return 0
