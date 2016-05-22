@@ -386,18 +386,24 @@ def main():
     mat_shininess = [ 50.0 ]
     light_position = [ -500.0, -500.0, 0.0, 0.0 ]
     light_position1 = [ 500.0, 500.0, 0.0, 0.0 ]
+    light_position2 = [ 500.0, -500.0, 0.0, 0.0 ]
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glShadeModel(GL_SMOOTH);
 
     glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
     glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess)
     glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+
     glLightfv(GL_LIGHT1, GL_DIFFUSE, [1.0,0.0,0.2,1.0])
     glLightfv(GL_LIGHT1, GL_POSITION, light_position1)
+
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, [0.0,0.0,1.0,1.0])
+    glLightfv(GL_LIGHT2, GL_POSITION, light_position2)
 
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     glEnable(GL_LIGHT1)
+    glEnable(GL_LIGHT2)
     glEnable(GL_DEPTH_TEST)
     """
     glEnable(GL_LIGHTING)
