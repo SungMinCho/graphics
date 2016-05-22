@@ -26,6 +26,7 @@ class Camera:
 
     def vectorFromXY(self, x, y):
         x -= self.centerx
+        x = -x
         y -= self.centery
         r1_aux = x*x + y*y
         if r1_aux >= self.radiusSqr:
