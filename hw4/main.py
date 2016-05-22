@@ -279,9 +279,6 @@ def display():
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
-    glColor4f(1, 1, 1, 0)
-    glutSolidSphere(15, 20, 20)
-
     l = len(catmullCrossSections)
     l = 1 / l
     (R, G, B) = (0, 1, 0)
@@ -295,6 +292,15 @@ def display():
         prev = c
         R += l
         G -= l
+
+    glColor4f(1, 1, 1, 0)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glEnable(GL_CULL_FACE)
+    glCullFace(GL_FRONT)
+    glutSolidCube(15)
+    #glutSolidSphere(15, 20, 20)
+    glDisable(GL_CULL_FACE)
 
     glFlush()
     glutSwapBuffers()
@@ -334,6 +340,8 @@ def animate(value):
 
 def reshape(width, height):
     glViewport(0, 0, width, height)
+    global camera
+    camera = Camera(camera.orientation, width, height)
     project()
 
 def windowKey(key, x, y):
@@ -375,7 +383,7 @@ def main():
     glutReshapeFunc(reshape)
     glutKeyboardFunc(windowKey)
     glutMouseFunc(mouseEvent)
-    glutMotionFunc(camera.drag)
+    glutMotionFunc(lambda x, y: camera.drag(x,y))
     glutCreateMenu(windowMenu)
     glutTimerFunc(15, animate, 0)
 

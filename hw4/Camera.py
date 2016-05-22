@@ -26,7 +26,7 @@ class Camera:
 
     def vectorFromXY(self, x, y):
         x -= self.centerx
-        x = -x
+        #x = -x
         y -= self.centery
         r1_aux = x*x + y*y
         if r1_aux >= self.radiusSqr:
@@ -59,6 +59,7 @@ class Camera:
         v2 = self.vectorFromXY(x, y)
         self.lastv = v2
         n = Vector.cross(v1, v2)
+        n.y = -n.y
         if n.length() == 0:
             return
         n = self.orientation.rotateVector(n)
