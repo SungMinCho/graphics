@@ -387,6 +387,7 @@ def main():
     light_position = [ -500.0, 0.0, 0.0, -1.0 ]
     light_position1 = [ 500.0, 500.0, 0.0, -1.0 ]
     light_position2 = [ 500.0, -500.0, 0.0, -1.0 ]
+    light_position3 = [ -500.0, -500.0, 500.0, -1.0 ]
     glClearColor(0.0, 0.0, 0.0, 0.0)
     glShadeModel(GL_SMOOTH);
 
@@ -402,10 +403,14 @@ def main():
     glLightfv(GL_LIGHT2, GL_DIFFUSE, [0.0,0.0,1.0,1.0])
     glLightfv(GL_LIGHT2, GL_POSITION, light_position2)
 
+    glLightfv(GL_LIGHT3, GL_DIFFUSE, [0.8,0.8,0.1,0.3])
+    glLightfv(GL_LIGHT3, GL_POSITION, light_position3)
+
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
     glEnable(GL_LIGHT1)
     glEnable(GL_LIGHT2)
+    glEnable(GL_LIGHT3)
     glEnable(GL_DEPTH_TEST)
     """
     glEnable(GL_LIGHTING)
