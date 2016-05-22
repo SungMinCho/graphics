@@ -24,6 +24,8 @@ controlPointsNum = 0
 
 catmullCrossSections = []
 
+vertexNormals = {}
+
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
 class CrossSection:
@@ -212,16 +214,27 @@ def parse():
                 catmullCrossSections.append(c)
  
 def drawMesh(c1, c2): # c1, c2 is CrossSection
+    global vertexNormals
+
     glBegin(GL_TRIANGLE_STRIP)
     for (p1, p2) in list(zip(c1.realPoints, c2.realPoints)) + [(c1.realPoints[0], c2.realPoints[0])]:
-        glVertex3f(p1[0], p1[1], p1[2])
-        glVertex3f(p2[0], p2[1], p2[2])
+        p1p = p1[0]
+        p1n = p1[1]
+        glNormal3f(p1n.x, p1n.y, p1n.z)
+        glVertex3f(p1p[0], p1p[1], p1p[2])
+
+        p2p = p2[0]
+        p2n = p2[1]
+        glNormal3f(p2n.x, p2n.y, p2n.z)
+        glVertex3f(p2p[0], p2p[1], p2p[2])
     glEnd()
 
 def pointToStlString(p):
     return str(p[0]) + " " + str(p[1]) + " " + str(p[2])
 
-def writeMesh(f, c1, c2):
+def appendNormals(c1, c2):
+    global vertexNormals
+
     T1 = None
     T2 = c1.realPoints[0]
     T3 = c2.realPoints[0]
@@ -230,30 +243,25 @@ def writeMesh(f, c1, c2):
         (T1, T2, T3) = (T2, T3, p1)
         V = Vector(T2[0]-T1[0],T2[1]-T1[1],T2[2]-T1[2])
         W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
-        N = Vector.cross(V, W)
-        N = (-N.x, -N.y, -N.z)
-        # write
-        f.write("facet normal " + pointToStlString(N) + "\n")
-        f.write("    outer loop\n")
-        f.write("        vertex " + pointToStlString(T1) + '\n')
-        f.write("        vertex " + pointToStlString(T2) + '\n')
-        f.write("        vertex " + pointToStlString(T3) + '\n')
-        f.write("    endloop\n")
-        f.write("endfacet\n")
+        #N = Vector.cross(V, W)
+        #N = (-N.x, -N.y, -N.z)
+        N = Vector.cross(W, V)
+
+        for p in (T1,T2,T3):
+            if p not in vertexNormals:
+                vertexNormals[p] = []
+            vertexNormals[p].append(N)
 
         (T1, T2, T3) = (T2, T3, p2)
         V = Vector(T2[0]-T1[0],T2[1]-T1[1],T2[2]-T1[2])
         W = Vector(T3[0]-T1[0],T3[1]-T1[1],T3[2]-T1[2])
         N = Vector.cross(V, W)
-        N = (N.x, N.y, N.z)
-        # write
-        f.write("facet normal " + pointToStlString(N) + "\n")
-        f.write("    outer loop\n")
-        f.write("        vertex " + pointToStlString(T1) + '\n')
-        f.write("        vertex " + pointToStlString(T3) + '\n')
-        f.write("        vertex " + pointToStlString(T2) + '\n')
-        f.write("    endloop\n")
-        f.write("endfacet\n")
+        #N = (N.x, N.y, N.z)
+
+        for p in (T1,T2,T3):
+            if p not in vertexNormals:
+                vertexNormals[p] = []
+            vertexNormals[p].append(N)
 
 def project():
     camera.lookat()
@@ -269,7 +277,7 @@ def display():
     #for c in crossSections:
     #    closedCurve(c)
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
     l = len(catmullCrossSections)
     l = 1 / l
@@ -285,21 +293,37 @@ def display():
         R += l
         G -= l
 
-
     glFlush()
     glutSwapBuffers()
 
-def write_stl_file():
-    with open("output.stl", "w") as f:
-        f.write("solid \n")
-        prev = None
-        for c in catmullCrossSections:
-            if prev == None:
-                prev = c
-                continue
-            writeMesh(f, prev, c)
+def preCalculateNormals(): # pre-calculate noramls and attach them to realpoints of crosssections
+    global vertexNormals, catmullCrossSections
+
+    prev = None
+    for c in catmullCrossSections:
+        if prev == None:
             prev = c
-        f.write("endsolid \n")
+            continue
+        appendNormals(prev, c)
+        prev = c
+
+    for k in vertexNormals:
+        v = Vector(0,0,0)
+        for n in vertexNormals[k]:
+            v = v + n
+        v = v.normalize()
+        vertexNormals[k] = v
+
+    for c in catmullCrossSections:
+        for i in range(len(c.realPoints)):
+            p = c.realPoints[i]
+            if p in vertexNormals:
+                v = vertexNormals[p]
+            else:
+                v = Vector(0,-1,0)
+                assert(False)
+            c.realPoints[i] = (p, v)
+
 
 def animate(value):
     glutPostRedisplay()
@@ -356,8 +380,37 @@ def main():
     glLoadIdentity()
 
     parse()
-    #write_stl_file()
+    preCalculateNormals()
 
+    mat_specular = [ 1.0, 1.0, 1.0, 1.0 ]
+    mat_shininess = [ 50.0 ]
+    light_position = [ -500.0, -500.0, 0.0, 0.0 ]
+    light_position1 = [ 500.0, 500.0, 0.0, 0.0 ]
+    glClearColor(0.0, 0.0, 0.0, 0.0)
+    glShadeModel(GL_SMOOTH);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular)
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess)
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, [1.0,0.0,0.2,1.0])
+    glLightfv(GL_LIGHT1, GL_POSITION, light_position1)
+
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    glEnable(GL_LIGHT1)
+    glEnable(GL_DEPTH_TEST)
+    """
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
+    la0 = [0.2,0.2,0.2,1.0]
+    ld0 = [1.0,0.2,0.0,1.0]
+    ls0 = [1.0,1.0,1.0,1.0]
+    lp0 = [10.0,10.0,10.0,0]
+    glLightfv(GL_LIGHT0, GL_AMBIENT, la0)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, ld0)
+    glLightfv(GL_LIGHT0, GL_SPECULAR, ls0)
+    glLightfv(GL_LIGHT0, GL_POSITION, lp0)
+    """
     glutMainLoop()
     return 0
 
