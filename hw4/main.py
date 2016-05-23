@@ -321,8 +321,18 @@ def display():
     glMaterialfv(GL_FRONT, GL_AMBIENT, [0,0,0,1])
     glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.1,0.35,0.1,1])
     glMaterialfv(GL_FRONT, GL_SPECULAR, [0.45,0.55,0.45,1])
-    glMaterialfv(GL_FRONT, GL_SHININESS, [0.25])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.25*128])
     glTranslatef(-30, 30, 0)
+    glutSolidCube(15)
+    glPopMatrix()
+
+    glPushMatrix()
+    # bronze
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [0.2125,0.1275,0.054,1])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.714,0.4284,0.18144,1])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.393548,0.271906,0.166721,1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.2*128])
+    glTranslatef(30, 30, 0)
     glutSolidCube(15)
     glPopMatrix()
 
