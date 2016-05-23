@@ -27,13 +27,9 @@ class Polygon:
 
   def point_side(self, p):
     p0 = self.points[0]
-    p1 = self.points[1]
+    v = p - p0
 
-    v0 = p1 - p0
-    v1 = p - p0
-
-    c = Vector.cross(v0, v1)
-    c = Vector.dot(c, c)
+    c = Vector.dot(self.normal, v)
     if c < 0:
       return -1
     elif c > 0:
