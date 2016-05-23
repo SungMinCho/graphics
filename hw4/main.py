@@ -279,8 +279,14 @@ def display():
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
-    glEnable(GL_COLOR_MATERIAL)
+    #glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+    #glEnable(GL_COLOR_MATERIAL)
+
+    # white rubber
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [0.05,0.05,0.05,1])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.5,0.5,0.5,1])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.7,0.7,0.7,1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.078125*128])
 
     l = len(catmullCrossSections)
     l = 1 / l
@@ -308,6 +314,19 @@ def display():
     glDisable(GL_CULL_FACE)
 
     glDisable(GL_COLOR_MATERIAL)
+
+    glPushMatrix()
+    #glColor3f(0, 1, 0)
+    # green plastic
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [0,0,0,1])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.1,0.35,0.1,1])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.45,0.55,0.45,1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.25])
+    glTranslatef(-30, 30, 0)
+    glutSolidCube(15)
+    glPopMatrix()
+
+    #glDisable(GL_COLOR_MATERIAL)
 
     glFlush()
     glutSwapBuffers()
