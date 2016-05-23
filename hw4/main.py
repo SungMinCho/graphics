@@ -5,6 +5,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from quaternion import *
 from Camera import *
+from polygon import *
 
 windowName = b"window"
 windowWidth = 1000
