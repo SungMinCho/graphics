@@ -324,7 +324,6 @@ def display():
     """
 
     # draw translucent objects
-    global translucentTrianglesBSP, camera
     translucentTrianglesBSP.draw(camera.camera)
 
     glPushMatrix()
