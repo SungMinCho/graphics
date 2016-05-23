@@ -21,6 +21,9 @@ class Vector:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __str__(self):
+        return "(" + ", ".join([str(self.x), str(self.y), str(self.z)]) + ")"
+
     def dot(v1, v2):
         return v1.x*v2.x + v1.y*v2.y + v1.z*v2.z
 

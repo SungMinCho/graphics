@@ -8,6 +8,10 @@ class Polygon:
     # points should all be on the same plane
     self.points = points
     self.normal = Vector.cross(points[1]-points[0], points[2]-points[0])
+    #print('v0', points[1]-points[0])
+    #print('v1', points[2]-points[0])
+    #print('normal', self.normal)
+    #print('normal length', self.normal.length())
     self.R = R
     self.G = G
     self.B = B
@@ -60,8 +64,14 @@ class Polygon:
       return ([], [polygon])
 
   def ray_intersection(self, p0, p1):
+    assert(self.point_side(p0) * self.point_side(p1) < 0)
+    #print('pointside0', self.point_side(p0))
+    #print('pointside1', self.point_side(p1))
+    #print('normal size', Vector.dot(self.normal, self.normal))
     v0 = self.points[0]
     n = self.normal
+    if(Vector.dot(n, (p1-p0))) == 0:
+      return p0
     r = (Vector.dot(n, (v0 - p0))) / (Vector.dot(n, (p1 - p0)))
     return (p0 + (r * (p1 - p0)))
 
@@ -132,7 +142,7 @@ class Triangle(Polygon):
 
 
 class BSP:
-  def __init__(self, polygons):
+  def __init__(self, polygons, depth=0):
     #assert(len(polygons) > 0)
     if len(polygons) == 0:
       self.isLeaf = True
@@ -143,19 +153,35 @@ class BSP:
       self.rightTree = BSP([])
     else:
       self.isLeaf = False
-      left = []
-      right = []
-      n = polygons[0]
-      self.node = n
-      for p in polygons[1:]:
-        d = n.divide_polygon(p)
-        for l in d[0]:
-          left.append(l)
-        for r in d[1]:
-          right.append(r)
 
-      self.leftTree = BSP(left)
-      self.rightTree = BSP(right)
+      #print('polygons', len(polygons))
+      for i in range(len(polygons)):
+        left = []
+        right = []
+        n = polygons[i]
+        for p in polygons[:i] + polygons[i+1:]:
+          d = n.divide_polygon(p)
+          for l in d[0]:
+            left.append(l)
+          for r in d[1]:
+            right.append(r)
+
+        ll = len(left)
+        lr = len(right)
+        if (ll*2 < lr or lr*2 < ll) and (i < len(polygons) - 1):
+          continue # load balancing
+
+        self.node = n
+        #n.draw()
+        left = [x for x in left if x.normal.length() > 0.01]
+        right = [x for x in right if x.normal.length() > 0.01]
+        if depth > 50:
+          self.leftTree = BSP([])
+          self.rightTree = BSP([])
+        else:
+          self.leftTree = BSP(left, depth+1)
+          self.rightTree = BSP(right, depth+1)
+        return
 
   def draw(self, viewpoint):
     if self.isLeaf:
@@ -174,3 +200,8 @@ class BSP:
       # i guess order doesn't matter in this case...?
       self.leftTree.draw(viewpoint)
       self.rightTree.draw(viewpoint)
+
+  def count(self):
+    if self.isLeaf:
+      return 0
+    return 1 + self.leftTree.count() + self.rightTree.count()

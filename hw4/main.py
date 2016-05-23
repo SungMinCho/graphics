@@ -6,6 +6,7 @@ from OpenGL.GLUT import *
 from quaternion import *
 from Camera import *
 from polygon import *
+from ironman import *
 
 windowName = b"window"
 windowWidth = 1000
@@ -28,6 +29,8 @@ catmullCrossSections = []
 vertexNormals = {}
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
+
+ironman = IronMan()
 
 translucentTriangles = []
 translucentTrianglesBSP = None
@@ -324,7 +327,7 @@ def display():
     """
 
     # draw translucent objects
-    global translucentTrianglesBSP, camera
+    global translucentTrianglesBSP
     translucentTrianglesBSP.draw(camera.camera)
 
     glPushMatrix()
@@ -507,7 +510,7 @@ def main():
     p6 = Vector(-r, -r, r)
     p7 = Vector(r, -r, r)
 
-    translucentTriangles.append(Triangle([p0, p1, p2], 1, 0, 0, 0.5))
+    """translucentTriangles.append(Triangle([p0, p1, p2], 1, 0, 0, 0.5))
     translucentTriangles.append(Triangle([p1, p2, p3], 1, 0, 0, 0.5))
 
     translucentTriangles.append(Triangle([p2, p3, p6], 0, 1, 0, 0.5))
@@ -523,9 +526,13 @@ def main():
     translucentTriangles.append(Triangle([p2, p4, p6], 0, 1, 0, 0.5))
 
     translucentTriangles.append(Triangle([p4, p5, p6], 0, 0, 1, 0.5))
-    translucentTriangles.append(Triangle([p5, p6, p7], 0, 0, 1, 0.5))
+    translucentTriangles.append(Triangle([p5, p6, p7], 0, 0, 1, 0.5))"""
+
+    translucentTriangles += ironman.getTriangles()
+    print('triangles', len(translucentTriangles))
 
     translucentTrianglesBSP = BSP(translucentTriangles)
+    print('BSP count', translucentTrianglesBSP.count())
 
     glutMainLoop()
     return 0
