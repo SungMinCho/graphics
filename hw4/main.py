@@ -346,6 +346,16 @@ def display():
     glutSolidCube(15)
     glPopMatrix()
 
+    glPushMatrix()
+    # chrome
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [0.25,0.25,0.25,1])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.4,0.4,0.4,1])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.774597,0.774597,0.774597,1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.6*128])
+    glTranslatef(-60, 30, 0)
+    glutSolidCube(15)
+    glPopMatrix()
+
     #glDisable(GL_COLOR_MATERIAL)
 
     glFlush()
