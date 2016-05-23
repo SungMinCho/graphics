@@ -101,7 +101,7 @@ class Triangle(Polygon):
       v0 = i1 - left[0]
       v1 = i0 - left[0]
       v2 = left[1] - left[0]
-      if Vector.cross(v0, v1) * Vector.cross(v0, v2) < 0:
+      if Vector.dot(Vector.cross(v0, v1), Vector.cross(v0, v2)) < 0:
         diagonal = i1
         other = i0
       else:
@@ -113,13 +113,13 @@ class Triangle(Polygon):
       return ([leftTriangle1, leftTriangle2], [rightTriangle])
     else: # two on right side
       i0 = self.ray_intersection(left[0], right[0])
-      i1 = self.ray_intersection(left[1], right[0])
+      i1 = self.ray_intersection(left[0], right[1])
 
       # find diagonal
       v0 = i1 - right[0]
       v1 = i0 - right[0]
       v2 = right[1] - right[0]
-      if Vector.cross(v0, v1) * Vector.cross(v0, v2) < 0:
+      if Vector.dot(Vector.cross(v0, v1), Vector.cross(v0, v2)) < 0:
         diagonal = i1
         other = i0
       else:
