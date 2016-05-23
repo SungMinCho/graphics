@@ -29,6 +29,9 @@ vertexNormals = {}
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
 
+translucentTriangles = []
+translucentTrianglesBSP = None
+
 class CrossSection:
     def mat_point(m, p):
         x = m[0][0]*p[0] + m[1][0]*p[1] + m[2][0]*p[2] + m[3][0]*p[3]
@@ -305,6 +308,7 @@ def display():
 
     #glDisable(GL_COLOR_MATERIAL)
 
+    """
     glEnable(GL_COLOR_MATERIAL)
     glColor4f(0, 0, 1, 0.3)
     glEnable(GL_BLEND)
@@ -317,6 +321,11 @@ def display():
     glDisable(GL_COLOR_MATERIAL)
 
     glDisable(GL_COLOR_MATERIAL)
+    """
+
+    # draw translucent objects
+    global translucentTrianglesBSP, camera
+    translucentTrianglesBSP.draw(camera.camera)
 
     glPushMatrix()
     #glColor3f(0, 1, 0)
@@ -484,18 +493,24 @@ def main():
     glEnable(GL_LIGHT2)
     glEnable(GL_LIGHT3)
     #glEnable(GL_DEPTH_TEST)
-    """
-    glEnable(GL_LIGHTING)
-    glEnable(GL_LIGHT0)
-    la0 = [0.2,0.2,0.2,1.0]
-    ld0 = [1.0,0.2,0.0,1.0]
-    ls0 = [1.0,1.0,1.0,1.0]
-    lp0 = [10.0,10.0,10.0,0]
-    glLightfv(GL_LIGHT0, GL_AMBIENT, la0)
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, ld0)
-    glLightfv(GL_LIGHT0, GL_SPECULAR, ls0)
-    glLightfv(GL_LIGHT0, GL_POSITION, lp0)
-    """
+
+    # define translucent things
+    global translucentTriangles, translucentTrianglesBSP
+    r = 8
+    p0 = Vector(-r, r, -r)
+    p1 = Vector(r, r, -r)
+    p2 = Vector(-r, r, r)
+    p3 = Vector(r, r, r)
+
+    p4 = Vector(-r, -r, -r)
+    p5 = Vector(r, -r, -r)
+    p6 = Vector(-r, -r, r)
+    p7 = Vector(r, -r, r)
+
+    translucentTriangles.append(Triangle([p0, p1, p2], 1, 0, 0, 0.5))
+    translucentTriangles.append(Triangle([p1, p2, p3], 1, 0, 0, 0.5))
+    translucentTrianglesBSP = BSP(translucentTriangles)
+
     glutMainLoop()
     return 0
 

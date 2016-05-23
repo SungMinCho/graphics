@@ -1,3 +1,6 @@
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from OpenGL.GLUT import *
 from quaternion import *
 
 class Polygon:
@@ -11,11 +14,16 @@ class Polygon:
     self.A = A
 
   def draw(self):
+    glEnable(GL_COLOR_MATERIAL)
     glColor4f(self.R, self.G, self.B, self.A)
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glBegin(GL_POLYGON)
     for p in self.points:
       glVertex3f(p.x, p.y, p.z)
     glEnd()
+    glDisable(GL_BLEND)
+    glDisable(GL_COLOR_MATERIAL)
 
   def point_side(self, p):
     p0 = self.points[0]
@@ -25,6 +33,7 @@ class Polygon:
     v1 = p - p0
 
     c = Vector.cross(v0, v1)
+    c = Vector.dot(c, c)
     if c < 0:
       return -1
     elif c > 0:
@@ -128,10 +137,14 @@ class Triangle(Polygon):
 
 class BSP:
   def __init__(self, polygons):
-    assert(len(polygons) > 0)
-    if(len(polygons) == 1):
+    #assert(len(polygons) > 0)
+    if len(polygons) == 0:
       self.isLeaf = True
+    elif(len(polygons) == 1):
+      self.isLeaf = False
       self.node = polygons[0]
+      self.leftTree = BSP([])
+      self.rightTree = BSP([])
     else:
       self.isLeaf = False
       left = []
@@ -150,7 +163,6 @@ class BSP:
 
   def draw(self, viewpoint):
     if self.isLeaf:
-      self.node.draw()
       return
 
     s = self.node.point_side(viewpoint)
