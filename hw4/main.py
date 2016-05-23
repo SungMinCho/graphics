@@ -336,6 +336,16 @@ def display():
     glutSolidCube(15)
     glPopMatrix()
 
+    glPushMatrix()
+    # ruby
+    glMaterialfv(GL_FRONT, GL_AMBIENT, [0.1745,0.01175,0.01175,1])
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, [0.61424,0.04136,0.04136,1])
+    glMaterialfv(GL_FRONT, GL_SPECULAR, [0.727811,0.626959,0.626959,1])
+    glMaterialfv(GL_FRONT, GL_SHININESS, [0.6*128])
+    glTranslatef(0, 40, -20)
+    glutSolidCube(15)
+    glPopMatrix()
+
     #glDisable(GL_COLOR_MATERIAL)
 
     glFlush()
