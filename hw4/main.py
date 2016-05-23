@@ -304,14 +304,16 @@ def display():
 
     #glDisable(GL_COLOR_MATERIAL)
 
-    glColor4f(0, 0, 1, 0.5)
+    glEnable(GL_COLOR_MATERIAL)
+    glColor4f(0, 0, 1, 0.3)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_CULL_FACE)
-    glCullFace(GL_FRONT)
+    #glEnable(GL_CULL_FACE)
+    #glCullFace(GL_FRONT)
     glutSolidCube(15)
     #glutSolidSphere(15, 20, 20)
-    glDisable(GL_CULL_FACE)
+    #glDisable(GL_CULL_FACE)
+    glDisable(GL_COLOR_MATERIAL)
 
     glDisable(GL_COLOR_MATERIAL)
 
@@ -480,7 +482,7 @@ def main():
     glEnable(GL_LIGHT1)
     glEnable(GL_LIGHT2)
     glEnable(GL_LIGHT3)
-    glEnable(GL_DEPTH_TEST)
+    #glEnable(GL_DEPTH_TEST)
     """
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0)
