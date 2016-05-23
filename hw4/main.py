@@ -509,6 +509,22 @@ def main():
 
     translucentTriangles.append(Triangle([p0, p1, p2], 1, 0, 0, 0.5))
     translucentTriangles.append(Triangle([p1, p2, p3], 1, 0, 0, 0.5))
+
+    translucentTriangles.append(Triangle([p2, p3, p6], 0, 1, 0, 0.5))
+    translucentTriangles.append(Triangle([p3, p6, p7], 0, 1, 0, 0.5))
+
+    translucentTriangles.append(Triangle([p3, p1, p7], 0, 0, 1, 0.5))
+    translucentTriangles.append(Triangle([p1, p7, p5], 0, 0, 1, 0.5))
+
+    translucentTriangles.append(Triangle([p1, p0, p5], 1, 0, 0, 0.5))
+    translucentTriangles.append(Triangle([p0, p5, p4], 1, 0, 0, 0.5))
+
+    translucentTriangles.append(Triangle([p0, p2, p4], 0, 1, 0, 0.5))
+    translucentTriangles.append(Triangle([p2, p4, p6], 0, 1, 0, 0.5))
+
+    translucentTriangles.append(Triangle([p4, p5, p6], 0, 0, 1, 0.5))
+    translucentTriangles.append(Triangle([p5, p6, p7], 0, 0, 1, 0.5))
+
     translucentTrianglesBSP = BSP(translucentTriangles)
 
     glutMainLoop()
