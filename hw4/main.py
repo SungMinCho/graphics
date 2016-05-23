@@ -279,6 +279,9 @@ def display():
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
 
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+    glEnable(GL_COLOR_MATERIAL)
+
     l = len(catmullCrossSections)
     l = 1 / l
     (R, G, B) = (0, 1, 0)
@@ -292,6 +295,8 @@ def display():
         prev = c
         R += l
         G -= l
+
+    glDisable(GL_COLOR_MATERIAL)
 
     glColor4f(1, 1, 1, 0)
     glEnable(GL_BLEND)
