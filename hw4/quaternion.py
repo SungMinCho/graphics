@@ -34,6 +34,8 @@ class Vector:
         return sqrt(Vector.dot(self, self))
 
     def normalize(self):
+        if self.length() == 0:
+            return self
         return (1/self.length()) * self
 
 class Quaternion:
