@@ -58,10 +58,12 @@ class Polygon:
           if s == 0: # if it's 1 0 1 1 0, 1 is the representative (if we keep s as 0 then we might mistake it for left (<= 0))
             s = ss
 
-    if s <= 0:
+    if s < 0:
       return ([polygon], [])
-    else:
+    elif s > 0:
       return ([], [polygon])
+    else:
+      return ([], [], [polygon])
 
   def ray_intersection(self, p0, p1):
     assert(self.point_side(p0) * self.point_side(p1) < 0)
@@ -148,7 +150,7 @@ class BSP:
       self.isLeaf = True
     elif(len(polygons) == 1):
       self.isLeaf = False
-      self.node = polygons[0]
+      self.node = [polygons[0]]
       self.leftTree = BSP([])
       self.rightTree = BSP([])
     else:
@@ -157,6 +159,7 @@ class BSP:
       #print('polygons', len(polygons))
       for i in range(len(polygons)):
         left = []
+        same = []
         right = []
         n = polygons[i]
         for p in polygons[:i] + polygons[i+1:]:
@@ -165,17 +168,21 @@ class BSP:
             left.append(l)
           for r in d[1]:
             right.append(r)
+          if len(d) > 2:
+            for s in d[2]:
+              same.append(s)
 
         ll = len(left)
         lr = len(right)
         if (ll*2 < lr or lr*2 < ll) and (i < len(polygons) - 1):
           continue # load balancing
 
-        self.node = n
+        self.node = [n] + same
         #n.draw()
         left = [x for x in left if x.normal.length() > 0.01]
         right = [x for x in right if x.normal.length() > 0.01]
-        if depth > 50:
+        #if depth > 50:
+        if False:
           self.leftTree = BSP([])
           self.rightTree = BSP([])
         else:
@@ -187,14 +194,18 @@ class BSP:
     if self.isLeaf:
       return
 
-    s = self.node.point_side(viewpoint)
+    s = self.node[0].point_side(viewpoint)
     if s < 0:
       self.rightTree.draw(viewpoint)
-      self.node.draw()
+      for n in self.node:
+        n.draw()
+      #self.node.draw()
       self.leftTree.draw(viewpoint)
     elif s > 0:
       self.leftTree.draw(viewpoint)
-      self.node.draw()
+      for n in self.node:
+        n.draw()
+      #self.node.draw()
       self.rightTree.draw(viewpoint)
     else:
       # i guess order doesn't matter in this case...?
