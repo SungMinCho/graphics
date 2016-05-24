@@ -6,7 +6,6 @@ from OpenGL.GLUT import *
 from quaternion import *
 from Camera import *
 from polygon import *
-from ironman import *
 
 windowName = b"window"
 windowWidth = 1200
@@ -29,8 +28,6 @@ catmullCrossSections = []
 vertexNormals = {}
 
 camera = Camera(Quaternion(1, 0, 0, 0), windowWidth, windowHeight)
-
-ironman = IronMan()
 
 translucentTriangles = []
 translucentTrianglesBSP = None
