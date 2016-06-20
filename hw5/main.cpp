@@ -113,8 +113,8 @@ public:
   }
 };
 Object* objects[] = {//Scene: radius, position, emission, color, material
-  new Sphere(1e5, Vec( 1e5-9,40.8,81.6), Vec(),Vec(.75,.25,.25),DIFF),//Left
-  new Sphere(1e5, Vec(-1e5+109,40.8,81.6),Vec(),Vec(.25,.25,.75),DIFF),//Rght
+  new Sphere(1e5, Vec( 1e5-9,40.8,81.6), Vec(),Vec(.75,.75,.25),DIFF),//Left
+  new Sphere(1e5, Vec(-1e5+109,40.8,81.6),Vec(),Vec(.25,.75,.75),DIFF),//Rght
   new Sphere(1e5, Vec(50,40.8, 1e5),     Vec(),Vec(.75,.75,.75),DIFF),//Back
   new Sphere(1e5, Vec(50,40.8,-1e5+170), Vec(),Vec(.75,.75,.75),DIFF),//Frnt
   new Sphere(1e5, Vec(50, 1e5-10, 81.6),    Vec(),Vec(.75,.75,.75),DIFF),//Botm
