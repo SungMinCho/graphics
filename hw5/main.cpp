@@ -44,30 +44,35 @@ public:
 class Triangle : public Object {
 public:
   Vec n, center;
-  Vec p1, p2, p3;
+  Vec p1, p2, p3, e1, e2;
   Triangle(Vec p1_, Vec p2_, Vec p3_, Vec e_, Vec c_, Refl_t refl_):
     p1(p1_), p2(p2_), p3(p3_), Object(0, Vec(), e_, c_, refl_) {
-      n = p1%p2;
+      e1 = p2 - p1;
+      e2 = p3 - p1;
+      n = e1%e2;
+      n.norm();
+      //n = n * -1;
       center = Vec();
       center = center + p1;
       center = center + p2;
       center = center + p3;
       center = center * (0.333333333);
+      //center = center + n;
       p = center;
       Vec t = center - p1;
       rad = t.dot(t);
     }
 
   virtual double intersect(const Ray &r) {
-    Vec e1, e2;  //Edge1, Edge2
+    //Vec e1, e2;  //Edge1, Edge2
     Vec P, Q, T;
     double det, inv_det, u, v;
     double t;
     double EPSILON = 1e-4;
 
     //Find vectors for two edges sharing V1
-    e1 = p2 - p1;
-    e2 = p3 - p1;
+    //e1 = p2 - p1;
+    //e2 = p3 - p1;
     //Begin calculating determinant - also used to calculate u parameter
     P = r.d % e2;
     //if determinant is near zero, ray lies in plane of triangle
@@ -111,17 +116,22 @@ Object* objects[] = {//Scene: radius, position, emission, color, material
   new Sphere(1e5, Vec( 1e5-9,40.8,81.6), Vec(),Vec(.75,.25,.25),DIFF),//Left
   new Sphere(1e5, Vec(-1e5+109,40.8,81.6),Vec(),Vec(.25,.25,.75),DIFF),//Rght
   new Sphere(1e5, Vec(50,40.8, 1e5),     Vec(),Vec(.75,.75,.75),DIFF),//Back
-  new Sphere(1e5, Vec(50,40.8,-1e5+170), Vec(),Vec(),           DIFF),//Frnt
+  new Sphere(1e5, Vec(50,40.8,-1e5+170), Vec(),Vec(.75,.75,.75),DIFF),//Frnt
   new Sphere(1e5, Vec(50, 1e5-10, 81.6),    Vec(),Vec(.75,.75,.75),DIFF),//Botm
   new Sphere(1e5, Vec(50,-1e5+91.6,81.6),Vec(),Vec(.75,.75,.75),DIFF),//Top
   new Sphere(16.5,Vec(27,16.5-10,47),       Vec(),Vec(1,1,1)*.999, SPEC),//Mirr
-  new Sphere(16.5,Vec(27,60,50),       Vec(),Vec(1,1,1)*.999, DIFF),//Above
+  new Sphere(10,Vec(27,60,50),       Vec(),Vec(0.2,0.6,0.2)*.999, DIFF),//Above
   new Sphere(16.5,Vec(73,16.5-10,78),       Vec(),Vec(1,1,1)*.999, REFR),//Glas
   new Sphere(1.5, Vec(50,81.6-6.5,81.6),Vec(4,4,4)*100,  Vec(), DIFF),//Lite
-  new Triangle(Vec(73, 16.5, 47), Vec(73, 16.5+50, 47), Vec(40, 16.5+25, 30), Vec(), Vec(1,1,1)*.999, SPEC),
+  new Triangle(Vec(50, 16.5, 60), Vec(80, 16.5+40, 47), Vec(40, 16.5+25, 25), Vec(), Vec(1,1,1)*.999, SPEC),
+
+  new Triangle(Vec(7, 70, 50), Vec(7, 50, 50), Vec(27, 70, 30), Vec(), Vec(1,1,1)*.999, SPEC),
+  new Triangle(Vec(7, 50, 50), Vec(27, 50, 30), Vec(27, 70, 30), Vec(), Vec(1,1,1)*.999, SPEC),
+  new Triangle(Vec(27, 70, 30), Vec(27, 50, 30), Vec(47, 70, 50), Vec(), Vec(1,1,1)*.999, SPEC),
+  new Triangle(Vec(27, 50, 30), Vec(47, 50, 50), Vec(47, 70, 50), Vec(), Vec(1,1,1)*.999, SPEC),
 };
 //int numObjects = sizeof(objects)/sizeof(Object);
-int numObjects = 11;
+int numObjects = 15;
 inline double clamp(double x){ return x<0 ? 0 : x>1 ? 1 : x; }
 inline int toInt(double x){ return int(pow(clamp(x),1/2.2)*255+.5); }
 inline bool intersect(const Ray &r, double &t, int &id){
